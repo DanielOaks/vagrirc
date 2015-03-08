@@ -92,9 +92,9 @@ echo 'Installing Puppet requirements'
 gem install haml hiera facter json ruby-augeas --no-ri --no-rdoc
 echo 'Finished installing Puppet requirements'
 
-echo 'Installing Puppet 3.4.3'
-gem install puppet --version 3.4.3 --no-ri --no-rdoc
-echo 'Finished installing Puppet 3.4.3'
+echo 'Installing Puppet 3.7.4'
+gem install puppet --version 3.7.4 --no-ri --no-rdoc
+echo 'Finished installing Puppet 3.7.4'
 
 cat >/usr/bin/puppet << 'EOL'
 #!/bin/bash

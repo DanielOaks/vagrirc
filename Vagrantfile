@@ -24,11 +24,14 @@ Vagrant.configure(2) do |config|
   end
 
   # Folder for IRC stuff.
-  config.vm.synced_folder "./irc", "/irc", :nfs => true
-  config.vm.synced_folder "./environment", "/environment", :nfs => true
+  if RUBY_PLATFORM.downcase.include?("darwin") or RUBY_PLATFORM.downcase.include?("linux")
+    enable_nfs = true
+  else
+    enable_nfs = false
+  end
 
-  # disable IPv6, breaks Puppet MySQL and makes things slow >_>
-  config.vm.provision :shell, inline: "if [ ! $(grep single-request-reopen /etc/sysconfig/network) ]; then echo RES_OPTIONS=single-request-reopen >> /etc/sysconfig/network && service network restart; fi"
+  config.vm.synced_folder "./irc", "/irc", :nfs => enable_nfs
+  config.vm.synced_folder "./environment", "/environment", :nfs => enable_nfs
 
   # We use Puppet to provision MySQL and such
   config.vm.provision "shell", path: "environment/shell/core.sh"
@@ -44,7 +47,7 @@ Vagrant.configure(2) do |config|
     }
     puppet.options = ['--modulepath=/tmp/modules']
     puppet.manifests_path = "environment/manifests"
-    puppet.manifest_file = "default.pp"
+    puppet.manifest_file = ""
   end
 
 end
