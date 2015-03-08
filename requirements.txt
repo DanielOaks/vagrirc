@@ -1,1 +1,3 @@
+appdirs
 docopt
+requests
