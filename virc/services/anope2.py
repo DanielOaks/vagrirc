@@ -5,7 +5,7 @@ from zipfile import ZipFile
 
 import requests
 
-from .base import BaseServer
+from .base import BaseServices
 
 
 def get_members(zip):
@@ -28,12 +28,12 @@ def get_members(zip):
             yield zipinfo
 
 
-class HybridServer(BaseServer):
-    """Implements support for the Hybrid IRCd."""
-    name = 'hybrid'
-    release = '8.2.5'
+class Anope2Services(BaseServices):
+    """Implements support for Anope2 Services."""
+    name = 'anope2'
+    release = '2.0.1'
     def download_release(self):
-        url = 'https://github.com/ircd-hybrid/ircd-hybrid/archive/{}.zip'.format(self.release)
+        url = 'https://github.com/anope/anope/archive/{}.zip'.format(self.release)
         cache_folder = os.path.join(self.cache_directory, self.release)
 
         # see if it already exists

@@ -5,8 +5,8 @@ import os
 import appdirs
 
 
-class BaseServer:
-    """Represents a base server."""
+class BaseServices:
+    """Represents a services package."""
     name = None
     release = None
     def __init__(self):
@@ -18,7 +18,7 @@ class BaseServer:
         self.base_cache_directory = appdirs.user_cache_dir(appname, appauthor)
 
         # server_* slug here to stop possible collisions with services/etc names
-        slug = 'server_{}'.format(self.name)
+        slug = 'services_{}'.format(self.name)
         self.cache_directory = os.path.join(self.base_cache_directory, slug)
 
         if not os.path.exists(self.cache_directory):
@@ -29,5 +29,5 @@ class BaseServer:
         ...
 
     def write_config(self, filename, info):
-        """Write Hybrid config file to the given filename."""
+        """Write config file to the given filename."""
         ...

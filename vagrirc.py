@@ -22,9 +22,8 @@ Options:
     --version               Show VagrIRC version
 """
 from docopt import docopt
-
-VERSION = 'VagrIRC 0.0.1'
+import virc
 
 if __name__ == '__main__':
-    arguments = docopt(__doc__, version=VERSION)
+    arguments = docopt(__doc__, version=virc.name_version)
     print(arguments)
