@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 # VagrIRC Virc library
+import os
+
 
 def get_members(zip):
     """get_members for zipfile, stripping common directory prefixes.
