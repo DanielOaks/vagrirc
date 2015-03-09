@@ -10,7 +10,7 @@ configuration files and shell scripts for the virtual machine to provision it
 all once it's online.
 
 Usage:
-    vagrirc.py gen [options] <network_name>
+    vagrirc.py generate [options] [network_name]
     vagrirc.py (-h | --help)
     vagrirc.py --version
 
@@ -26,4 +26,10 @@ import virc
 
 if __name__ == '__main__':
     arguments = docopt(__doc__, version=virc.name_version)
-    print(arguments)
+
+    if arguments['generate']:
+        manager = virc.VircManager()
+        ircd = arguments['--ircd']
+        services = arguments['--services']
+        servers = int(arguments['--servers'])
+        manager.generate(ircd_type=ircd, services_type=services, server_count=servers)
