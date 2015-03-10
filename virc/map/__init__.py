@@ -2,6 +2,12 @@
 # VagrIRC Virc library
 import random
 import string
+import networkx as nx
+
+
+class IrcNetwork(nx.Graph):
+    """Represents an IRC network."""
+    ...
 
 
 class MapBaseServer:
@@ -11,15 +17,20 @@ class MapBaseServer:
     hidden = False  # hidden to clients
     services = False  # provides services
 
-    def __init__(self, software):
-        self.links = []
+    def __init__(self, network, software):
+        self.network = network
         self.software = software  # name of the software package powering this node
         self.sid = '{}{}{}'.format(random.randint(0,9), random.randint(0,9), random.choice(string.ascii_uppercase))
 
+        self.network.add_node(self)
+
     def link_to(self, server):
         """Link to the given server."""
-        self.links.append(server)
-        server.links.append(self)
+        self.network.add_edge(self, server)
+
+    def can_add_server(self):
+        """Whether we can add a client server to this server."""
+        return False
 
 
 class MapHubServer(MapBaseServer):
@@ -27,13 +38,16 @@ class MapHubServer(MapBaseServer):
     hub = True
     hidden = True
 
-    def __init__(self, software, for_services=False):
-        MapBaseServer.__init__(self, software)
+    def __init__(self, network, software, for_services=False):
+        MapBaseServer.__init__(self, network, software)
         self.max_server_links = random.randint(2, 3)
         self.for_services = for_services
 
     def can_add_server(self):
-        return len(self.links) + 1 <= self.max_server_links
+        """Whether we can add a client server to this server."""
+        links = self.network.edges([self])
+
+        return len(links) + 1 <= self.max_server_links
 
 
 class MapClientServer(MapBaseServer):
@@ -47,44 +61,25 @@ class MapServicesServer(MapBaseServer):
     hidden = True
 
 
-def find_empty_hub(server, ignore_ids=[]):
+def find_empty_hub(network):
     """Spiders a network, looking for a hub that can accept connections.
 
     If none are found, returns None.
     """
-    found = None
-
-    for s in server.links:
-        if s.sid in ignore_ids:
-            continue
-        if s.hub:
-            if s.can_add_server():
-                found = s
-                break
-            else:
-                found = find_empty_hub(s, ignore_ids=[s.sid])
-                if found is not None:
-                    break
-
-    return found
+    for server in network.nodes():
+        if server.can_add_server():
+            return server
 
 
-def find_real_hubs(server, ignore_ids=[]):
+def find_real_hubs(network):
     """Find all the hubs in a given network.
 
     Ignores hubs marked as 'for services'.
     """
     found = []
 
-    if server.hub and server.sid not in ignore_ids:
-        found.append(server)
-
-    for s in server.links:
-        if s.sid in ignore_ids:
-            continue
-        if s.hub and not s.for_services:
+    for server in network.nodes():
+        if server.hub and not server.for_services:
             found.append(server)
-            new_links = find_real_hubs(s, ignore_ids=[s.sid])
-            found = found + new_links
 
     return found

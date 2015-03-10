@@ -115,3 +115,7 @@ docs/_build/
 # PyBuilder
 target/
 
+
+### Virc ###
+/Server Map.*
+
