@@ -21,7 +21,6 @@ class MapBaseServer:
     def __init__(self, network, software):
         self.network = network
         self.software = software  # name of the software package powering this node
-        self.sid = '{}{}{}'.format(random.randint(0,9), random.randint(0,9), random.choice(string.ascii_uppercase))
 
         self.network.add_node(self)
 

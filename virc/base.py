@@ -44,10 +44,10 @@ class ReleaseDownloader:
             return False
 
         url = self.url.format(release=self.release)
-        cache_folder = os.path.join(self.cache_directory, self.release)
+        self.source_folder = os.path.join(self.cache_directory, self.release)
 
         # see if it already exists
-        if os.path.exists(cache_folder):
+        if os.path.exists(self.source_folder):
             return True
 
         # download file
@@ -67,7 +67,7 @@ class ReleaseDownloader:
         # extract into directory
         if self._download_type == 'zip':
             with ZipFile(tmp_filename, 'r') as source_zip:
-                source_zip.extractall(cache_folder, get_members(source_zip))
+                source_zip.extractall(self.source_folder, get_members(source_zip))
         else:
             raise Exception('Cannot extract/parse given download type')
 

@@ -1,4 +1,6 @@
 appdirs
 docopt
+names
 networkx
 requests
+PyYAML

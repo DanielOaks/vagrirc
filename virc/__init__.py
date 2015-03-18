@@ -1,10 +1,14 @@
 #!/usr/bin/env python3
 # VagrIRC Virc library
 import random
+import string
+
+import names
 import networkx as nx
 import matplotlib.pyplot as plt
 
 from . import map
+from . import serial
 from . import servers
 from . import services
 from .utils import nodelist
@@ -18,23 +22,24 @@ class VircManager:
     def __init__(self):
         self.network = None
 
-    def generate(self, ircd_type=None, services_type=None, use_services=True, server_count=1, hub_chance=0.35):
+    def generate(self, ircd_type=None, services_type=None, use_services=True, server_count=1):
         """Generate the given IRC server map."""
         self.network = map.IrcNetwork()
 
         # make sure we have a valid ircd
         if ircd_type:
-            ircd_type = servers.available[ircd_type]
+            ircd_type = servers.available[ircd_type]().name
         else:
-            ircd_type = servers.available.values()[0]
+            ircd_type = servers.available.values()[0]().name
 
         # make sure we have valid services
         if services_type:
-            services_type = services.available[services_type]
+            services_type = services.available[services_type]().name
         else:
-            services_type = services.available.values()[0]
+            services_type = services.available.values()[0]().name
 
-        # generate base network
+        # generate network
+        #
         for i in range(server_count):
             # first run, only a single server!
             if len(self.network.nodes()) < 1:
@@ -81,6 +86,7 @@ class VircManager:
         stats = map.network_stats(self.network)
 
         # draw network map to a file
+        #
         try:
             pos = nx.graphviz_layout(self.network, prog='sfdp', args='-Goverlap=false -Gmaxiter=500 -Gcenter=1')
             mov = True
@@ -135,26 +141,85 @@ class VircManager:
             'node_shape': 'h',
         })
 
+        # lines
         nx.draw(self.network, pos, **{
             'nodelist': [],
+            'edge_color': '#bbbbbb',
         })
 
-        # draw labels
-        def labelpos(position_dict, x=0, y=0):
-            """Modify the given label dict and return the real position dict."""
-            new_pos = {}
-            # other graph layouts break this pos, so just disable it
-            if mov:
-                for s in position_dict:
-                    new_pos[s] = (position_dict[s][0] + x, position_dict[s][1] + y)
-            return new_pos
+        # server configs
+        #
 
-        # nx.draw_networkx_labels(self.network, labelpos(pos, x=-2), **{
-        #     'edgelist': [],
-        #     'labels': {s: s.sid for s in self.network.nodes()},
-        #     'font_family': 'monospace',
-        #     'font_size': 4,
-        #     'font_color': [0, 0, 0],
-        # })
+        # assign server names and client ports
+        current_client_port = 6667
+        used_names = []
+        used_sids = []
+
+        for server in self.network.nodes():
+            info = {}
+
+            # generate name
+            server_name = names.get_first_name().lower()
+            while server_name in used_names:
+                server_name = names.get_first_name().lower()
+            used_names.append(server_name)
+
+            info['name'] = server_name
+
+            if server.hub:
+                info['name'] += '_hub'
+            elif server.services:
+                info['name'] += '_services'
+
+            # generate sid
+            sid = '72A'
+            while sid in used_sids:
+                sid = '{}{}{}'.format(random.randint(0,9), random.randint(0,9), random.choice(string.ascii_uppercase))
+            used_sids.append(sid)
+
+            info['sid'] = sid
+
+            # port for clients to connect on
+            if server.client:
+                info['client_port'] = current_client_port
+                current_client_port += 1
+
+            # and set info
+            server.info = info
+
+        # assign ports and passwords for server links
+        current_server_port = 10000
+        while current_server_port <= current_client_port:
+            current_server_port += 500
+
+        used_passwords = []
+
+        for link in self.network.edges():
+            info = []
+
+            # port for things to connect on
+            info.append(('port', current_server_port))
+            current_server_port += 1
+
+            # generate link password
+            password = '{}_{}'.format(names.get_last_name().lower(), random.randint(0, 9999))
+            while password in used_passwords or len(password) < 9:
+                password = '{}_{}'.format(names.get_last_name().lower(), random.randint(0, 9999))
+
+            info.append(('password', password))
+
+            nx.set_edge_attributes(self.network, link, info)
+
+        # labels
+        nx.draw_networkx_labels(self.network, pos, **{
+            'edgelist': [],
+            'labels': {s: s.info['name'] for s in self.network.nodes()},
+            'font_family': 'monospace',
+            'font_size': 6,
+            'font_color': [0.2, 0.2, 0.2],
+        })
 
         plt.savefig('Server Map.pdf')
+
+        # save network
+        serial.save('net.yaml', self.network)
