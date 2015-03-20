@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 # VagrIRC Virc library
+import os
 import random
 import string
 
@@ -19,8 +20,15 @@ name_version = 'VagrIRC {}'.format(version)
 
 class VircManager:
     """Can create and map out an IRC network."""
-    def __init__(self):
+    def __init__(self, irc_dir=None):
         self.network = None
+
+        if irc_dir is None:
+            irc_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'irc'))
+        self.irc_dir = irc_dir
+
+        if not os.path.exists(self.irc_dir):
+            os.makedirs(self.irc_dir)
 
     def generate(self, ircd_type=None, services_type=None, use_services=True, server_count=1):
         """Generate the given IRC server map."""
@@ -219,7 +227,9 @@ class VircManager:
             'font_color': [0.2, 0.2, 0.2],
         })
 
-        plt.savefig('Server Map.pdf')
+        map_filename = os.path.join(self.irc_dir, 'Server Map.pdf')
+        plt.savefig(map_filename)
 
         # save network
-        serial.save('net.yaml', self.network)
+        serial_filename = os.path.join(self.irc_dir, 'map.yaml')
+        serial.save(serial_filename, self.network)
