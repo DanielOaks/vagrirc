@@ -95,6 +95,8 @@ class VircManager:
 
         # draw network map to a file
         #
+        node_edge_color = '#cccccc'
+
         try:
             pos = nx.graphviz_layout(self.network, prog='sfdp', args='-Goverlap=false -Gmaxiter=500 -Gcenter=1')
             mov = True
@@ -109,45 +111,45 @@ class VircManager:
         #   number of args here matches the number of servers, eg if 3 core hubs
         #   and 3 numbers in colour tuple, apply all sorts of dodgy stuff, etc
         if stats['core_hubs'] == 3:
-            core_hub_color = (0.2, 0.3, 0.4, 1.0)
+            core_hub_color = (0.5, 0.6, 0.7, 1.0)
         else:
-            core_hub_color = (0.2, 0.3, 0.4)
+            core_hub_color = (0.5, 0.6, 0.7)
 
-        nx.draw(self.network, pos, **{
+        nodes = nx.draw_networkx_nodes(self.network, pos, **{
             'nodelist': [n for n in self.network.nodes() if n.hub and n.core],
-            'edgelist': [],
             'node_color': core_hub_color,
             'node_size': 150,
             'node_shape': 'h',
         })
+        nodes.set_edgecolor(node_edge_color)
 
         # regular hubs
         if stats['normal_hubs'] == 3:
-            normal_hub_color = (0.5, 0.6, 0.7, 1.0)
+            normal_hub_color = (0.8, 0.8, 0.9, 1.0)
         else:
-            normal_hub_color = (0.5, 0.6, 0.7)
+            normal_hub_color = (0.8, 0.8, 0.9)
 
-        nx.draw(self.network, pos, **{
+        nodes = nx.draw_networkx_nodes(self.network, pos, **{
             'nodelist': [n for n in self.network.nodes() if n.hub and not n.core],
-            'edgelist': [],
             'node_color': normal_hub_color,
             'node_size': 150,
             'node_shape': 'h',
         })
+        nodes.set_edgecolor(node_edge_color)
 
         # client servers
         if stats['client_servers'] == 3:
-            client_color = (0.9, 0.2, 0.3, 1.0)
+            client_color = (0.9, 0.7, 0.7, 1.0)
         else:
-            client_color = (0.9, 0.2, 0.3)
+            client_color = (0.9, 0.7, 0.7)
 
-        nx.draw(self.network, pos, **{
+        nodes = nx.draw_networkx_nodes(self.network, pos, **{
             'nodelist': [n for n in self.network.nodes() if not n.hub],
-            'edgelist': [],
             'node_color': client_color,
             'node_size': 120,
             'node_shape': 'h',
         })
+        nodes.set_edgecolor(node_edge_color)
 
         # lines
         nx.draw(self.network, pos, **{
