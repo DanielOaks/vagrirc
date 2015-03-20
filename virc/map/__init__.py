@@ -117,6 +117,7 @@ def find_real_hubs(network, is_core=False):
 def network_stats(network):
     """Counts the types of servers in the given network."""
     stats = {
+        'servers': 0,
         'core_hubs': 0,
         'normal_hubs': 0,
         'service_hubs': 0,
@@ -128,6 +129,8 @@ def network_stats(network):
     }
 
     for server in network.nodes():
+        stats['servers'] += 1
+
         if server.client:
             stats['client_servers'] += 1
         elif server.hub and server.for_services:

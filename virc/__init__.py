@@ -91,6 +91,19 @@ class VircManager:
             new_client_server.link_to(empty_hub)
             continue
 
+        # add a services server
+        stats = map.network_stats(self.network)
+        if stats['core_hubs'] > 0:
+            hubs = map.find_real_hubs(self.network, is_core=True)
+        elif stats['normal_hubs'] > 0:
+            hubs = map.find_real_hubs(self.network)
+        else:
+            hubs = self.network.nodes()  # just grab the client server
+
+        new_services = map.MapServicesServer(self.network, services_type)
+        new_services.link_to(random.choice(hubs))
+
+        # calc stats
         stats = map.network_stats(self.network)
 
         # draw network map to a file
@@ -106,10 +119,25 @@ class VircManager:
             mov = False
             print('Warning: Using Shell layout instead of Graphviz layout. Display may not look nice or legible.')
 
-        # core hubs
+        # services
         # NOTE: we do this because nx.draw seems to apply colours weirdly when the
         #   number of args here matches the number of servers, eg if 3 core hubs
         #   and 3 numbers in colour tuple, apply all sorts of dodgy stuff, etc
+        if stats['services_servers'] == 3:
+            services_color = (0.7, 0.9, 0.7, 1.0)
+        else:
+            services_color = (0.7, 0.9, 0.7)
+
+        nodes = nx.draw_networkx_nodes(self.network, pos, **{
+            'nodelist': [n for n in self.network.nodes() if n.services],
+            'node_color': services_color,
+            'node_size': 150,
+            'node_shape': 'h',
+        })
+        if nodes is not None:
+            nodes.set_edgecolor(node_edge_color)
+
+        # core hubs
         if stats['core_hubs'] == 3:
             core_hub_color = (0.5, 0.6, 0.7, 1.0)
         else:
@@ -121,7 +149,8 @@ class VircManager:
             'node_size': 150,
             'node_shape': 'h',
         })
-        nodes.set_edgecolor(node_edge_color)
+        if nodes is not None:
+            nodes.set_edgecolor(node_edge_color)
 
         # regular hubs
         if stats['normal_hubs'] == 3:
@@ -135,7 +164,8 @@ class VircManager:
             'node_size': 150,
             'node_shape': 'h',
         })
-        nodes.set_edgecolor(node_edge_color)
+        if nodes is not None:
+            nodes.set_edgecolor(node_edge_color)
 
         # client servers
         if stats['client_servers'] == 3:
@@ -144,12 +174,13 @@ class VircManager:
             client_color = (0.9, 0.7, 0.7)
 
         nodes = nx.draw_networkx_nodes(self.network, pos, **{
-            'nodelist': [n for n in self.network.nodes() if not n.hub],
+            'nodelist': [n for n in self.network.nodes() if not n.hub and not n.services],
             'node_color': client_color,
             'node_size': 120,
             'node_shape': 'h',
         })
-        nodes.set_edgecolor(node_edge_color)
+        if nodes is not None:
+            nodes.set_edgecolor(node_edge_color)
 
         # lines
         nx.draw(self.network, pos, **{
