@@ -24,9 +24,12 @@ class MapBaseServer:
 
         self.network.add_node(self)
 
-    def link_to(self, server):
+    def link_to(self, server, info=None):
         """Link to the given server."""
         self.network.add_edge(self, server)
+        if info:
+            link = (self, server)
+            nx.set_edge_attributes(self.network, link, info)
 
     def can_add_client_server(self):
         """Whether we can add a client server to this server."""

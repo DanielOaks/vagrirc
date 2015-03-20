@@ -30,6 +30,23 @@ class VircManager:
         if not os.path.exists(self.irc_dir):
             os.makedirs(self.irc_dir)
 
+        self.map_filename = os.path.join(self.irc_dir, 'Server Map.pdf')
+        self.serial_filename = os.path.join(self.irc_dir, 'map.yaml')
+
+    def save_network_map(self):
+        with open(self.serial_filename, 'w') as serial_file:
+            serial_file.write(serial.dump(self.network))
+
+    def load_network_map(self):
+        with open(self.serial_filename, 'r') as serial_file:
+            self.network = serial.load(serial_file.read())
+
+    def write_server_configs(self):
+        """Write config files for all our servers."""
+        # for server in self.network.nodes():
+        #     server.write_config('lol.json')
+        ...
+
     def generate(self, ircd_type=None, services_type=None, use_services=True, server_count=1):
         """Generate the given IRC server map."""
         self.network = map.IrcNetwork()
@@ -108,6 +125,7 @@ class VircManager:
 
         # draw network map to a file
         #
+        edge_color = '#bbbbbb'
         node_edge_color = '#cccccc'
 
         try:
@@ -185,7 +203,7 @@ class VircManager:
         # lines
         nx.draw(self.network, pos, **{
             'nodelist': [],
-            'edge_color': '#bbbbbb',
+            'edge_color': edge_color,
         })
 
         # server configs
@@ -260,9 +278,7 @@ class VircManager:
             'font_color': [0.2, 0.2, 0.2],
         })
 
-        map_filename = os.path.join(self.irc_dir, 'Server Map.pdf')
-        plt.savefig(map_filename)
+        plt.savefig(self.map_filename)
 
-        # save network
-        serial_filename = os.path.join(self.irc_dir, 'map.yaml')
-        serial.save(serial_filename, self.network)
+        # save network map
+        self.save_network_map()

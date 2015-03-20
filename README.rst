@@ -6,8 +6,6 @@ Basically, this is designed to make my IRC development network provisioning more
 
 Todo
 ----
-Create an actual network map.
-
 Create configuration files.
 
 Actually create the various servers, link them all together.

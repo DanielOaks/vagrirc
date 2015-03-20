@@ -77,8 +77,9 @@ class ReleaseDownloader:
 
 class BaseServer(ReleaseDownloader):
     _slug_type = 'server'
+    info = {}
 
-    def write_config(self, filename, info):
+    def write_config(self, filename):
         """Write config file to the given filename."""
         ...
 
@@ -86,6 +87,6 @@ class BaseServer(ReleaseDownloader):
 class BaseServices(ReleaseDownloader):
     _slug_type = 'services'
 
-    def write_config(self, filename, info):
+    def write_config(self, filename):
         """Write config file to the given filename."""
         ...

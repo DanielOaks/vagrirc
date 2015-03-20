@@ -10,8 +10,8 @@ from . import map
 extension = 'yaml'
 
 
-def save(filename, network):
-    """Save the given network map to a file."""
+def dump(network):
+    """Serialize the given network map to a string."""
     info = {
         'servers': {},
         'links': {},
@@ -19,15 +19,15 @@ def save(filename, network):
 
     # servers
     for server in network.nodes():
-        server_info = server.info
+        server_info = {}
 
-        server_info['software'] = server.software
-
-        for attr in ['hub', 'core', 'client', 'hidden', 'services']:
+        for attr in ['software', 'hub', 'core', 'client', 'hidden', 'services', 'for_services']:
             if getattr(server, attr, False):
                 server_info[attr] = True
 
-        info['servers'][server_info['sid']] = server_info
+        server_info['info'] = server.info
+
+        info['servers'][server.info['sid']] = server_info
 
     # links
     for link in network.edges():
@@ -40,6 +40,55 @@ def save(filename, network):
         
         info['links'][sids] = link_info
 
-    # writing to file
-    with open(filename, 'w') as outfile:
-        outfile.write(yaml.dump(info, default_flow_style=False))
+    # serializing
+    return yaml.dump(info, default_flow_style=False)
+
+
+def load(in_str):
+    """Load the given network from the given map."""
+    servers = {}
+    network = map.IrcNetwork()
+    # WARNING: THIS IS UNSAFE,
+    #   BUT REQUIRED BECAUSE OTHERWISE YAML DOES NOT UNDERSTAND THE TUPLE
+    #   DICTIONARY KEYS AND BREAKS. THANKS YAML.
+    nw_info = yaml.load(in_str)
+
+    if not nw_info:
+        return network
+
+    for sid, info in nw_info.get('servers', {}).items():
+        software = info.get('software', None)
+        hub = info.get('hub', False)
+        core = info.get('core', False)
+        client = info.get('client', False)
+        hidden = info.get('hidden', False)
+        services = info.get('services', False)
+        for_services = info.get('for_services', False)
+
+        if hub and core:
+            server = map.MapCoreHubServer(network, software)
+        elif hub:
+            server = map.MapHubServer(network, software)
+        elif client:
+            server = map.MapClientServer(network, software)
+        elif services:
+            server = map.MapServicesServer(network, software)
+        else:
+            raise Exception('Something broke!')
+
+        if hidden:
+            server.hidden = True
+        if for_services:
+            server.for_services = True
+
+        servers[sid] = server
+
+    for link, info in nw_info.get('links', {}).items():
+        link_info = []
+        for name, val in info.items():
+            link_info.append((name, val))
+        link_info = tuple(link_info)
+
+        servers[link[0]].link_to(servers[link[1]], info=link_info)
+
+    return network
