@@ -43,9 +43,15 @@ class VircManager:
 
     def write_server_configs(self):
         """Write config files for all our servers."""
-        # for server in self.network.nodes():
-        #     server.write_config('lol.json')
-        ...
+        for node in self.network.nodes():
+            if node.client:
+                server = servers.available[node.software]()
+            elif node.services:
+                server = services.available[node.software]()
+            else:
+                raise Exception('this node type not implemented: {}'.format(node))
+
+            server.write_config('some_folder')
 
     def generate(self, ircd_type=None, services_type=None, use_services=True, server_count=1):
         """Generate the given IRC server map."""

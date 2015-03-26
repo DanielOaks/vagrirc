@@ -28,6 +28,7 @@ class ReleaseDownloader:
         # server_* slug here to stop possible collisions with services/etc names
         slug = '{}_{}'.format(self._slug_type, self.name)
         self.cache_directory = os.path.join(self.base_cache_directory, slug)
+        self.source_folder = os.path.join(self.cache_directory, self.release)
 
         if not os.path.exists(self.cache_directory):
             os.makedirs(self.cache_directory)
@@ -44,7 +45,6 @@ class ReleaseDownloader:
             return False
 
         url = self.url.format(release=self.release)
-        self.source_folder = os.path.join(self.cache_directory, self.release)
 
         # see if it already exists
         if os.path.exists(self.source_folder):

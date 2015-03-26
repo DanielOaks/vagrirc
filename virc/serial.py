@@ -22,8 +22,18 @@ def dump(network):
         server_info = {}
 
         for attr in ['software', 'hub', 'core', 'client', 'hidden', 'services', 'for_services']:
-            if getattr(server, attr, False):
-                server_info[attr] = True
+            if not hasattr(server, attr):
+                continue
+
+            value = getattr(server, attr, None)
+
+            if isinstance(value, bool):
+                if value:
+                    server_info[attr] = True
+                else:
+                    server_info[attr] = False
+            else:
+                server_info[attr] = value
 
         server_info['info'] = server.info
 
@@ -48,7 +58,8 @@ def load(in_str):
     """Load the given network from the given map."""
     servers = {}
     network = map.IrcNetwork()
-    # WARNING: THIS IS UNSAFE,
+
+    # WARNING: THIS LOADING METHOD IS UNSAFE,
     #   BUT REQUIRED BECAUSE OTHERWISE YAML DOES NOT UNDERSTAND THE TUPLE
     #   DICTIONARY KEYS AND BREAKS. THANKS YAML.
     nw_info = yaml.load(in_str)

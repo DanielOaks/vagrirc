@@ -13,4 +13,4 @@ class HybridServer(BaseServer):
 
     def write_config(self, folder):
         """Write config file to the given folder."""
-        print(self.release_folder, folder)
+        print('write config!', self.source_folder, folder)
