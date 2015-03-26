@@ -3,6 +3,7 @@
 import os
 import random
 import string
+import shutil
 
 import names
 import networkx as nx
@@ -32,6 +33,9 @@ class VircManager:
 
         self.map_filename = os.path.join(self.irc_dir, 'Server Map.pdf')
         self.serial_filename = os.path.join(self.irc_dir, 'map.yaml')
+        self.configs_base_dir = os.path.join(self.irc_dir, 'configs')
+        self.src_base_dir = os.path.join(self.irc_dir, 'src')
+        self.bin_base_dir = os.path.join(self.irc_dir, 'bin')
 
     def save_network_map(self):
         with open(self.serial_filename, 'w') as serial_file:
@@ -43,15 +47,20 @@ class VircManager:
 
     def write_server_configs(self):
         """Write config files for all our servers."""
+        # remove old config files
+        if os.path.exists(self.configs_base_dir):
+            shutil.rmtree(self.configs_base_dir)
+
+        # write new config files
         for node in self.network.nodes():
-            if node.client:
+            if node.client or node.hub:
                 server = servers.available[node.software]()
             elif node.services:
                 server = services.available[node.software]()
-            else:
-                raise Exception('this node type not implemented: {}'.format(node))
 
-            server.write_config('some_folder')
+            server_config_folder = os.path.join(self.configs_base_dir, '{}_{}'.format(server._slug_type, node.software), node.folder_slug)
+
+            server.write_config(server_config_folder)
 
     def generate(self, ircd_type=None, services_type=None, use_services=True, server_count=1):
         """Generate the given IRC server map."""

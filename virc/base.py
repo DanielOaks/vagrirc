@@ -76,7 +76,7 @@ class ReleaseDownloader:
 
 
 class BaseServer(ReleaseDownloader):
-    _slug_type = 'server'
+    _slug_type = 'ircd'
     info = {}
 
     def write_config(self, folder):
@@ -86,6 +86,7 @@ class BaseServer(ReleaseDownloader):
 
 class BaseServices(ReleaseDownloader):
     _slug_type = 'services'
+    info = {}
 
     def write_config(self, folder):
         """Write config file to the given folder."""

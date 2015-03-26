@@ -1,8 +1,36 @@
 #!/usr/bin/env python3
 # VagrIRC Virc library
 import os
+import re
 
 from ..base import BaseServer
+
+# Removal Regexes
+config_initial_regexes = [
+    re.compile(r'/\*(.|[\r\n])*?\*/'),  # c style comments
+    re.compile(r'\n\s*//.*'),  # c++ style comments
+    re.compile(r'\n\s*#.*'),  # shell style comments
+    (re.compile(r'\n(?:\s*\n)+'), r'\n'),  # remove blank lines
+    (re.compile(r'^[\s\n]*([\S\s]*?)[\s\n]*$'), r'\1\n'),  # remove start/end blank space, make sure newline at end
+
+    re.compile(r'\nmotd \{([^\}]*?)\};'),
+    re.compile(r'\nlisten \{([^\}]*?)\};'),
+    re.compile(r'\noperator \{([^\}]*?)\};'),
+    re.compile(r'\nconnect \{([^\}]*?)\};'),
+    re.compile(r'\ncluster \{([^\}]*?)\};'),
+    re.compile(r'\nshared \{([^\}]*?)\};'),
+    re.compile(r'\nkill \{([^\}]*?)\};'),
+    re.compile(r'\ndeny \{([^\}]*?)\};'),
+    re.compile(r'\nexempt \{([^\}]*?)\};'),
+    re.compile(r'\ngecos \{([^\}]*?)\};'),
+
+    re.compile(r'\nauth \{([^\}]*?)letmein([^\}]*?)\};'),
+    re.compile(r'\nauth \{([^\}]*?)tld([^\}]*?)\};'),
+    re.compile(r'\nresv \{([^\}]*?)helsinki([^\}]*?)\};'),
+
+    # basic config options
+    re.compile(r'\n\s*havent_read_conf.+'),
+]
 
 
 class HybridServer(BaseServer):
@@ -14,3 +42,30 @@ class HybridServer(BaseServer):
     def write_config(self, folder):
         """Write config file to the given folder."""
         print('write config!', self.source_folder, folder)
+
+        # load original config file
+        original_config_file = os.path.join(self.source_folder, 'doc', 'reference.conf')
+        with open(original_config_file, 'r') as config_file:
+            config_data = config_file.read()
+
+        # removing useless junk
+        for regex in config_initial_regexes:
+            # replacement
+            if isinstance(regex, (list, tuple)):
+                regex, sub = regex
+
+            # removal
+            else:
+                sub = ''
+
+            config_data = regex.sub(sub, config_data)
+
+        # writing out config file
+        output_config_dir = os.path.join(folder, 'etc')
+
+        if not os.path.exists(output_config_dir):
+            os.makedirs(output_config_dir)
+
+        output_config_file = os.path.join(output_config_dir, 'reference.conf')
+        with open(output_config_file, 'w') as config_file:
+            config_file.write(config_data)

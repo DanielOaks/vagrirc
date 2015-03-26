@@ -39,6 +39,25 @@ class MapBaseServer:
         """Whether we can add a hub server to this server."""
         return False
 
+    @property
+    def folder_slug(self):
+        """Returns a slug we use in folder names."""
+        prefix = ''
+
+        if self.client:
+            prefix = 'client'
+        elif self.hub and self.core:
+            prefix = 'core_hub'
+        elif self.hub:
+            prefix = 'hub'
+        elif self.services:
+            pass
+        else:
+            raise Exception('this node type not implemented: {}'.format(self))
+
+        return '{}{}{}'.format(prefix, '_' if prefix else '', self.info.get('name', '').split('_')[0])
+
+
 
 class MapHubServer(MapBaseServer):
     """Represents a hub server."""
