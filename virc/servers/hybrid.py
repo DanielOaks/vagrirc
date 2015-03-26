@@ -11,6 +11,6 @@ class HybridServer(BaseServer):
     release = '8.2.5'
     url = 'https://github.com/ircd-hybrid/ircd-hybrid/archive/{release}.zip'
 
-    def write_config(self, filename):
-        """Write config file to the given filename."""
-        print(self.release_folder, filename)
+    def write_config(self, folder):
+        """Write config file to the given folder."""
+        print(self.release_folder, folder)
