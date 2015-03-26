@@ -32,6 +32,11 @@ config_initial_regexes = [
     re.compile(r'\n\s*havent_read_conf.+'),
 ]
 
+config_regexes = {
+    'name': (re.compile(r'(\n\s*name = )[^\;]+(;)'), r'\1"{value}"\2'),
+    'sid': (re.compile(r'(\n\s*sid = )[0-9a-zA-Z]{3}(;)'), r'\1"{value}"\2'),
+}
+
 
 class HybridServer(BaseServer):
     """Implements support for the Hybrid IRCd."""
@@ -41,8 +46,6 @@ class HybridServer(BaseServer):
 
     def write_config(self, folder):
         """Write config file to the given folder."""
-        print('write config!', self.source_folder, folder)
-
         # load original config file
         original_config_file = os.path.join(self.source_folder, 'doc', 'reference.conf')
         with open(original_config_file, 'r') as config_file:
@@ -59,6 +62,15 @@ class HybridServer(BaseServer):
                 sub = ''
 
             config_data = regex.sub(sub, config_data)
+
+        # inserting actual values
+        for key, value in self.info.items():
+            if key in config_regexes:
+                regex, sub = config_regexes[key]
+                sub = sub.format(value=value)
+                config_data = regex.sub(sub, config_data)
+            else:
+                print('hybrid regex: skipping key:', key)
 
         # writing out config file
         output_config_dir = os.path.join(folder, 'etc')

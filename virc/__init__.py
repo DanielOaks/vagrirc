@@ -58,6 +58,8 @@ class VircManager:
             elif node.services:
                 server = services.available[node.software]()
 
+            server.info = node.info
+
             server_config_folder = os.path.join(self.configs_base_dir, '{}_{}'.format(server._slug_type, node.software), node.folder_slug)
 
             server.write_config(server_config_folder)
