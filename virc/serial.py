@@ -92,6 +92,8 @@ def load(in_str):
         if for_services:
             server.for_services = True
 
+        server.info = info.get('info', {})
+
         servers[sid] = server
 
     for link, info in nw_info.get('links', {}).items():
