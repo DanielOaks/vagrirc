@@ -34,7 +34,7 @@ config_initial_regexes = [
 
 config_regexes = {
     'name': (re.compile(r'(\n\s*name = )[^\;]+(;)'), r'\1"{value}"\2'),
-    'sid': (re.compile(r'(\n\s*sid = )[0-9a-zA-Z]{3}(;)'), r'\1"{value}"\2'),
+    'sid': (re.compile(r'(\n\s*sid = )"[0-9a-zA-Z]{3}"(;)'), r'\1"{value}"\2'),
 }
 
 
