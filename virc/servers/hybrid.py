@@ -33,8 +33,9 @@ config_initial_regexes = [
 ]
 
 config_regexes = {
-    'name': (re.compile(r'(\n\s*name = )[^\;]+(;)'), r'\1"{value}"\2'),
+    'name': (re.compile(r'(serverinfo \{\n\s*name = )[^\;]+(;)'), r'\1"{value}"\2'),
     'sid': (re.compile(r'(\n\s*sid = )"[0-9a-zA-Z]{3}"(;)'), r'\1"{value}"\2'),
+    'client_port': (re.compile(r'(\nauth \{[^\}]+\};)'), r'\1\nlisten{{\n    port = {value};\n}};')
 }
 
 
