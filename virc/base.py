@@ -13,6 +13,7 @@ class ReleaseDownloader:
     """Represents a basic release downloader."""
     name = None
     release = None
+    vcs = None
     url = None
     _download_type = None
     _slug_type = None
@@ -28,6 +29,8 @@ class ReleaseDownloader:
         # server_* slug here to stop possible collisions with services/etc names
         slug = '{}_{}'.format(self._slug_type, self.name)
         self.cache_directory = os.path.join(self.base_cache_directory, slug)
+        if self.release is None and self.vcs:
+            self.release = 'trunk'
         self.source_folder = os.path.join(self.cache_directory, self.release)
 
         if not os.path.exists(self.cache_directory):
@@ -39,40 +42,64 @@ class ReleaseDownloader:
                 # could also strip out # magic if necessary, later
                 self._download_type = self.url.rsplit('.', 1)[-1]
 
+        self.download_release()
+
     def download_release(self):
         """Download our expected release of the server, if not already cached."""
         if self.url is None:
             return False
 
-        url = self.url.format(release=self.release)
+        if self.vcs == 'git':
+            import git
 
-        # see if it already exists
-        if os.path.exists(self.source_folder):
-            return True
+            if os.path.exists(self.source_folder):
+                repo = git.Repo(self.source_folder)
+                repo.remotes.origin.fetch()
+                repo.remotes.origin.pull()
+            else:
+                repo = git.Repo.init(self.source_folder)
+                origin = repo.create_remote('origin', self.url)
+                assert origin.exists()
+                origin.fetch()
+                # track remote branch
+                repo.create_head('master', origin.refs.master).set_tracking_branch(origin.refs.master)
+                origin.pull()
 
-        # download file
-        tmp_filename = os.path.join(self.cache_directory, 'tmp_download.{}'.format(self._download_type))
-        with open(tmp_filename, 'wb') as handle:
-            r = requests.get(url, stream=True)
+            for submodule in repo.submodules:
+                submodule.update(init=True)
 
-            if not r.ok:
-                return False
+            repo.heads.master.checkout()
 
-            ONE_MEGABYTE = 1024 * 1024
-            for block in r.iter_content(ONE_MEGABYTE):
-                if not block:
-                    break
-                handle.write(block)
-
-        # extract into directory
-        if self._download_type == 'zip':
-            with ZipFile(tmp_filename, 'r') as source_zip:
-                source_zip.extractall(self.source_folder, get_members(source_zip))
         else:
-            raise Exception('Cannot extract/parse given download type')
+            # see if it already exists
+            if os.path.exists(self.source_folder):
+                return True
 
-        # remove temp file
-        os.remove(tmp_filename)
+            url = self.url.format(release=self.release)
+
+            # download file
+            tmp_filename = os.path.join(self.cache_directory, 'tmp_download.{}'.format(self._download_type))
+            with open(tmp_filename, 'wb') as handle:
+                r = requests.get(url, stream=True)
+
+                if not r.ok:
+                    return False
+
+                ONE_MEGABYTE = 1024 * 1024
+                for block in r.iter_content(ONE_MEGABYTE):
+                    if not block:
+                        break
+                    handle.write(block)
+
+            # extract into directory
+            if self._download_type == 'zip':
+                with ZipFile(tmp_filename, 'r') as source_zip:
+                    source_zip.extractall(self.source_folder, get_members(source_zip))
+            else:
+                raise Exception('Cannot extract/parse given download type')
+
+            # remove temp file
+            os.remove(tmp_filename)
 
 
 class BaseServer(ReleaseDownloader):
@@ -86,6 +113,15 @@ class BaseServer(ReleaseDownloader):
 
 class BaseServices(ReleaseDownloader):
     _slug_type = 'services'
+    info = {}
+
+    def write_config(self, folder):
+        """Write config file to the given folder."""
+        ...
+
+
+class BaseServiceBot(ReleaseDownloader):
+    _slug_type = 'servicebot'
     info = {}
 
     def write_config(self, folder):

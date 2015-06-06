@@ -54,91 +54,64 @@ class VircManager:
 
         # write new config files
         for node in self.network.nodes():
-            if node.client or node.hub:
+            if node.client:
                 server = servers.available[node.software]()
             elif node.services:
                 server = services.available[node.software]()
-            elif node.service_bots:
+            elif node.service_bot:
                 server = service_bots.available[node.software]()
 
             server.info = node.info
+            server.info['links'] = []
+            for link in self.network.edges():
+                # only write link info for this node
+                if link[0] != node and link[1] != node:
+                    continue
+
+                base_info = nx.get_edge_attributes(self.network, link)
+                if not base_info:
+                    base_info = nx.get_edge_attributes(self.network, (link[1], link[0]))
+
+                try:
+                    link_info = base_info[link]
+                except KeyError:
+                    link_info = base_info[(link[1], link[0])]
+
+                info = {k: v for (k,v) in link_info}
+
+                for k, v in dict(info).items():
+                    if k.endswith('_port'):
+                        if k.startswith(server.info['sid']):
+                            info['my_port'] = v
+                        else:
+                            info['remote_port'] = v
+
+                server.info['links'].append(info)
 
             server_config_folder = os.path.join(self.configs_base_dir, '{}_{}'.format(server._slug_type, node.software), node.folder_slug)
 
             server.write_config(server_config_folder)
 
-    def generate(self, ircd_type=None, services_type=None, use_services=True, server_count=1):
+    def generate(self, ircd_type=None, services_type=None, use_services=True, service_bots=[]):
         """Generate the given IRC server map."""
         self.network = map.IrcNetwork()
 
-        # make sure we have a valid ircd
-        if ircd_type:
-            ircd_type = servers.available[ircd_type]().name
-        else:
-            ircd_type = servers.available.values()[0]().name
-
-        # make sure we have valid services
-        if services_type:
-            services_type = services.available[services_type]().name
-        else:
-            services_type = services.available.values()[0]().name
+        ircd_type = servers.available[ircd_type]().name
+        services_type = services.available[services_type]().name
 
         # generate network
         #
-        for i in range(server_count):
-            # first run, only a single server!
-            if len(self.network.nodes()) < 1:
-                map.MapClientServer(self.network, ircd_type)
-                continue
-
-            # second server is always a hub server
-            if len(self.network.nodes()) < 2:
-                only_client_server = self.network.nodes()[0]
-                new_hub = map.MapHubServer(self.network, ircd_type)
-                new_hub.link_to(only_client_server)
-                continue
-
-            # network stats
-            stats = map.network_stats(self.network)
-
-            # see if we can add a new client server
-            empty_hub = map.find_empty_hub(self.network)
-
-            # add our own hub
-            if empty_hub is None:
-                normal_hubs = map.find_real_hubs(self.network)
-                empty_core_hub = map.find_empty_hub(self.network, is_core=True)
-
-                if empty_core_hub is None:
-                    if stats['core_hubs'] > 0:
-                        hubs = map.find_real_hubs(self.network, is_core=True)
-                    else:
-                        hubs = normal_hubs
-
-                    empty_core_hub = map.MapCoreHubServer(self.network, ircd_type)
-                    empty_core_hub.link_to(random.choice(hubs))
-
-                # create new hub and link it to the given core hub
-                new_hub = map.MapHubServer(self.network, ircd_type)
-                new_hub.link_to(empty_core_hub)
-                continue
-
-            # else, add a new client server!
-            new_client_server = map.MapClientServer(self.network, ircd_type)
-            new_client_server.link_to(empty_hub)
-            continue
+        map.MapClientServer(self.network, ircd_type)
+        only_client_server = self.network.nodes()[0]
 
         # add a services server
-        stats = map.network_stats(self.network)
-        if stats['core_hubs'] > 0:
-            hubs = map.find_real_hubs(self.network, is_core=True)
-        elif stats['normal_hubs'] > 0:
-            hubs = map.find_real_hubs(self.network)
-        else:
-            hubs = self.network.nodes()  # just grab the client server
-
         new_services = map.MapServicesServer(self.network, services_type)
-        new_services.link_to(random.choice(hubs))
+        new_services.link_to(only_client_server)
+
+        # add service bots
+        for bot_type in service_bots:
+            new_bot = map.MapServiceBot(self.network, bot_type)
+            new_bot.link_to(only_client_server)
 
         # calc stats
         stats = map.network_stats(self.network)
@@ -157,11 +130,26 @@ class VircManager:
             mov = False
             print('Warning: Using Shell layout instead of Graphviz layout. Display may not look nice or legible.')
 
-        # services
+        # client servers
         # NOTE: we do this because nx.draw seems to apply colours weirdly when the
-        #   number of args here matches the number of servers, eg if 3 core hubs
+        #   number of args here matches the number of servers, eg if 3 client servers
         #   and 3 numbers in colour tuple, apply all sorts of dodgy stuff, etc
-        if stats['services_servers'] == 3:
+        if stats['client_servers'] == 3:
+            client_color = (0.9, 0.7, 0.7, 1.0)
+        else:
+            client_color = (0.9, 0.7, 0.7)
+
+        nodes = nx.draw_networkx_nodes(self.network, pos, **{
+            'nodelist': [n for n in self.network.nodes() if not n.services and not n.service_bot],
+            'node_color': client_color,
+            'node_size': 120,
+            'node_shape': 'h',
+        })
+        if nodes is not None:
+            nodes.set_edgecolor(node_edge_color)
+
+        # services
+        if stats['service_servers'] == 3:
             services_color = (0.7, 0.9, 0.7, 1.0)
         else:
             services_color = (0.7, 0.9, 0.7)
@@ -175,46 +163,16 @@ class VircManager:
         if nodes is not None:
             nodes.set_edgecolor(node_edge_color)
 
-        # core hubs
-        if stats['core_hubs'] == 3:
-            core_hub_color = (0.5, 0.6, 0.7, 1.0)
+        # service bots
+        if stats['service_bots'] == 3:
+            service_bots_color = (0.7, 0.7, 0.9, 1.0)
         else:
-            core_hub_color = (0.5, 0.6, 0.7)
+            service_bots_color = (0.7, 0.7, 0.9)
 
         nodes = nx.draw_networkx_nodes(self.network, pos, **{
-            'nodelist': [n for n in self.network.nodes() if n.hub and n.core],
-            'node_color': core_hub_color,
+            'nodelist': [n for n in self.network.nodes() if n.service_bot],
+            'node_color': service_bots_color,
             'node_size': 150,
-            'node_shape': 'h',
-        })
-        if nodes is not None:
-            nodes.set_edgecolor(node_edge_color)
-
-        # regular hubs
-        if stats['normal_hubs'] == 3:
-            normal_hub_color = (0.8, 0.8, 0.9, 1.0)
-        else:
-            normal_hub_color = (0.8, 0.8, 0.9)
-
-        nodes = nx.draw_networkx_nodes(self.network, pos, **{
-            'nodelist': [n for n in self.network.nodes() if n.hub and not n.core],
-            'node_color': normal_hub_color,
-            'node_size': 150,
-            'node_shape': 'h',
-        })
-        if nodes is not None:
-            nodes.set_edgecolor(node_edge_color)
-
-        # client servers
-        if stats['client_servers'] == 3:
-            client_color = (0.9, 0.7, 0.7, 1.0)
-        else:
-            client_color = (0.9, 0.7, 0.7)
-
-        nodes = nx.draw_networkx_nodes(self.network, pos, **{
-            'nodelist': [n for n in self.network.nodes() if not n.hub and not n.services],
-            'node_color': client_color,
-            'node_size': 120,
             'node_shape': 'h',
         })
         if nodes is not None:
@@ -245,10 +203,10 @@ class VircManager:
 
             info['name'] = server_name
 
-            if server.hub:
-                info['name'] += '_hub'
-            elif server.services:
-                info['name'] += '_services'
+            if server.services:
+                info['name'] += '.services'
+            elif server.service_bot:
+                info['name'] += '.service.bot'
 
             # generate sid
             sid = '72A'
@@ -277,7 +235,9 @@ class VircManager:
             info = []
 
             # port for things to connect on
-            info.append(('port', current_server_port))
+            info.append(('{}_port'.format(link[0].info['sid']), current_server_port))
+            current_server_port += 1
+            info.append(('{}_port'.format(link[1].info['sid']), current_server_port))
             current_server_port += 1
 
             # generate link password

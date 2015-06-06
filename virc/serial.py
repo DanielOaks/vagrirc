@@ -21,7 +21,7 @@ def dump(network):
     for server in network.nodes():
         server_info = {}
 
-        for attr in ['software', 'hub', 'core', 'client', 'hidden', 'services', 'for_services']:
+        for attr in ['software', 'client', 'hidden', 'services', 'service_bot']:
             if not hasattr(server, attr):
                 continue
 
@@ -69,28 +69,23 @@ def load(in_str):
 
     for sid, info in nw_info.get('servers', {}).items():
         software = info.get('software', None)
-        hub = info.get('hub', False)
-        core = info.get('core', False)
         client = info.get('client', False)
         hidden = info.get('hidden', False)
         services = info.get('services', False)
-        for_services = info.get('for_services', False)
+        service_bot = info.get('service_bot', False)
 
-        if hub and core:
-            server = map.MapCoreHubServer(network, software)
-        elif hub:
-            server = map.MapHubServer(network, software)
-        elif client:
+        if client:
             server = map.MapClientServer(network, software)
         elif services:
             server = map.MapServicesServer(network, software)
+        elif service_bot:
+            server = map.MapServiceBot(network, software)
         else:
+            print(sid, info)
             raise Exception('Something broke!')
 
         if hidden:
             server.hidden = True
-        if for_services:
-            server.for_services = True
 
         server.info = info.get('info', {})
 

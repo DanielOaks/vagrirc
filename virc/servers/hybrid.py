@@ -42,7 +42,7 @@ config_regexes = {
 class HybridServer(BaseServer):
     """Implements support for the Hybrid IRCd."""
     name = 'hybrid'
-    release = '8.2.5'
+    release = '8.2.8'
     url = 'https://github.com/ircd-hybrid/ircd-hybrid/archive/{release}.zip'
 
     def write_config(self, folder):
@@ -63,6 +63,9 @@ class HybridServer(BaseServer):
                 sub = ''
 
             config_data = regex.sub(sub, config_data)
+
+        # special stuff
+        config_data = config_data.replace('hub = no;', 'hub = yes;')
 
         # inserting actual values
         for key, value in self.info.items():

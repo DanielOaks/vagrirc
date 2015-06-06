@@ -1,0 +1,56 @@
+#!/usr/bin/env python3
+# VagrIRC Virc library
+import os
+import shutil
+
+import yaml
+
+from ..base import BaseServiceBot
+
+
+class AcidServiceBot(BaseServiceBot):
+    """Implements support for the Hybrid IRCd."""
+    name = 'acid'
+    vcs = 'git'
+    url = 'https://gitlab.com/rizon/acid.git'
+
+    def write_config(self, folder):
+        """Write config file to the given folder."""
+        config_files = {
+            'pyva-native': [
+                os.path.join(self.source_folder, 'pyva', 'pyva-native', 'pyva-cpp', 'make.example.properties'),
+                os.path.join(folder, 'pyva', 'pyva-native', 'pyva-cpp', 'config.mk'),
+            ],
+            'acid': [
+                os.path.join(self.source_folder, 'acid', 'acidictive.example.yml'),
+                os.path.join(folder, 'acid', 'acidictive.yml'),
+            ],
+        }
+
+        # create folders
+        output_config_dir = os.path.join(folder, 'pyva', 'pyva-native', 'pyva-cpp')
+        if not os.path.exists(output_config_dir):
+            os.makedirs(output_config_dir)
+        output_config_dir = os.path.join(folder, 'acid')
+        if not os.path.exists(output_config_dir):
+            os.makedirs(output_config_dir)
+
+        # shouldn't need to change this
+        orig, new = config_files['pyva-native']
+        shutil.copyfile(orig, new)
+
+        # load original config file
+        orig, new = config_files['acid']
+        with open(orig, 'r') as config_file:
+            config_data = config_file.read()
+
+        conf = yaml.load(config_data)
+
+        # setting info
+        conf['uplink']['host'] = '127.0.0.1'
+        conf['uplink']['pass'] = self.info['links'][0]['password']
+        conf['uplink']['port'] = self.info['links'][0]['remote_port']
+
+        # and writing it out
+        with open(new, 'w') as config_file:
+            config_file.write(yaml.dump(conf))

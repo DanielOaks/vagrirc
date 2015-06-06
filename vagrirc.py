@@ -16,11 +16,11 @@ Usage:
     vagrirc.py --version
 
 Options:
-    --ircd <ircd>           IRCd to provision [default: hybrid].
-    --services <services>   Services package to provision [default: anope2].
-    --servers <servers>     Number of servers to have on the network [default: 1].
-    -h, --help              Show this screen
-    --version               Show VagrIRC version
+    --ircd <ircd>             IRCd to provision [default: hybrid].
+    --services <services>     Services package to provision [default: anope2].
+    --service-bots <bots>...  Service bots to include (separated by comma <,>).
+    -h, --help                Show this screen
+    --version                 Show VagrIRC version
 """
 from docopt import docopt
 import virc
@@ -32,8 +32,12 @@ if __name__ == '__main__':
         manager = virc.VircManager()
         ircd = arguments['--ircd']
         services = arguments['--services']
-        servers = int(arguments['--servers'])
-        manager.generate(ircd_type=ircd, services_type=services, server_count=servers)
+        service_bots = arguments.get('--service-bots', '')
+        if service_bots is None:
+            service_bots = ''
+        service_bots = service_bots.split(',')
+
+        manager.generate(ircd_type=ircd, services_type=services, service_bots=service_bots)
 
     elif arguments['write']:
         manager = virc.VircManager()

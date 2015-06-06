@@ -1,6 +1,6 @@
 VagrIRC
 =======
-IRC Network provisioning made easy, with Vagrant!
+IRC Testnet provisioning made easy, with Vagrant!
 
 Basically, this is designed to make my IRC development network provisioning more simple and easy.
 
@@ -8,7 +8,7 @@ Todo
 ----
 Create configuration files.
 
-Actually create the various servers, link them all together.
+Actually create the server.
 
 License
 -------

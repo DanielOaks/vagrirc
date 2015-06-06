@@ -12,11 +12,10 @@ class IrcNetwork(nx.Graph):
 
 class MapBaseServer:
     """Represents a server in some capacity."""
-    hub = False  # connects to more than one other server
-    core = False  # whether this is a 'core' hub server
     client = False  # connects to clients
     hidden = False  # hidden to clients
     services = False  # provides services
+    service_bot = False  # is a service bot
 
     def __init__(self, network, software):
         self.network = network
@@ -31,14 +30,6 @@ class MapBaseServer:
             link = (self, server)
             nx.set_edge_attributes(self.network, link, info)
 
-    def can_add_client_server(self):
-        """Whether we can add a client server to this server."""
-        return False
-
-    def can_add_hub_server(self):
-        """Whether we can add a hub server to this server."""
-        return False
-
     @property
     def folder_slug(self):
         """Returns a slug we use in folder names."""
@@ -46,53 +37,14 @@ class MapBaseServer:
 
         if self.client:
             prefix = 'client'
-        elif self.hub and self.core:
-            prefix = 'core_hub'
-        elif self.hub:
-            prefix = 'hub'
+        elif self.service_bot:
+            prefix = 'service_bot'
         elif self.services:
             pass
         else:
             raise Exception('this node type not implemented: {}'.format(self))
 
         return '{}{}{}'.format(prefix, '_' if prefix else '', self.info.get('name', '').split('_')[0])
-
-
-
-class MapHubServer(MapBaseServer):
-    """Represents a hub server."""
-    hub = True
-    hidden = True
-
-    def __init__(self, network, software, for_services=False):
-        MapBaseServer.__init__(self, network, software)
-        self.max_client_server_links = random.randint(2, 3)
-        self.max_hub_server_links = 1
-        self.for_services = for_services
-
-    def can_add_client_server(self):
-        """Whether we can add a client server to this server."""
-        links = [edge for edge in self.network.edges([self]) if edge[1].client]
-
-        return len(links) + 1 <= self.max_client_server_links
-
-    def can_add_hub_server(self):
-        """Whether we can add a_hub server to this server."""
-        links = [edge for edge in self.network.edges([self]) if edge[1].hub]
-
-        return len(links) + 1 <= self.max_hub_server_links
-
-
-class MapCoreHubServer(MapHubServer):
-    core = True
-
-    def __init__(self, network, software):
-        MapHubServer.__init__(self, network, software, for_services=False)
-        self.max_client_server_links = 0  # random.randint(-5, 1)
-        if self.max_client_server_links < 0:
-            self.max_client_server_links = 0
-
-        self.max_hub_server_links = random.randint(3, 7)
 
 
 class MapClientServer(MapBaseServer):
@@ -106,45 +58,19 @@ class MapServicesServer(MapBaseServer):
     hidden = True
 
 
-def find_empty_hub(network, is_core=False):
-    """Spiders a network, looking for a hub that can accept connections.
-
-    If none are found, returns None.
-    """
-    for server in network.nodes():
-        if is_core:
-            if server.can_add_hub_server():
-                return server
-        else:
-            if server.can_add_client_server():
-                return server
-
-
-def find_real_hubs(network, is_core=False):
-    """Find all the hubs in a given network.
-
-    Ignores hubs marked as 'for services'.
-    """
-    found = []
-
-    for server in network.nodes():
-        if server.hub and not server.for_services:
-            if is_core is not None and server.core != is_core:
-                continue
-            found.append(server)
-
-    return found
+class MapServiceBot(MapBaseServer):
+    """Represents a service bot."""
+    service_bot = True
+    hidden = True
 
 
 def network_stats(network):
     """Counts the types of servers in the given network."""
     stats = {
         'servers': 0,
-        'core_hubs': 0,
-        'normal_hubs': 0,
-        'service_hubs': 0,
         'client_servers': 0,
-        'services_servers': 0,
+        'service_servers': 0,
+        'service_bots': 0,
 
         'shown': 0,
         'hidden': 0,
@@ -155,14 +81,10 @@ def network_stats(network):
 
         if server.client:
             stats['client_servers'] += 1
-        elif server.hub and server.for_services:
-            stats['service_hubs'] += 1
-        elif server.hub and server.core:
-            stats['core_hubs'] += 1
-        elif server.hub:
-            stats['normal_hubs'] += 1
         elif server.services:
-            stats['services_servers'] += 1
+            stats['service_servers'] += 1
+        elif server.service_bot:
+            stats['service_servers'] += 1
 
         if server.hidden:
             stats['hidden'] += 1

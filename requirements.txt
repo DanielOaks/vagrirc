@@ -1,6 +1,7 @@
 appdirs
 docopt
 names
+gitpython
 networkx
 requests
 PyYAML
