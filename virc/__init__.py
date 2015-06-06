@@ -13,6 +13,7 @@ from . import map
 from . import serial
 from . import servers
 from . import services
+from . import service_bots
 from .utils import nodelist
 
 version = '0.0.1'
@@ -57,6 +58,8 @@ class VircManager:
                 server = servers.available[node.software]()
             elif node.services:
                 server = services.available[node.software]()
+            elif node.service_bots:
+                server = service_bots.available[node.software]()
 
             server.info = node.info
 
