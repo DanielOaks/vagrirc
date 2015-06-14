@@ -113,7 +113,7 @@ cp {config_folder}/etc/reference.conf {bin_folder}/etc/ircd.conf
 
         launch_filename = os.path.join(folder, 'launch.sh')
 
-        with open(launch_filename, 'w') as b_file:
+        with open(launch_filename, 'w') as l_file:
             l_file.write(launch_file)
 
         return True

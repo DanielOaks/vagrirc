@@ -53,6 +53,8 @@ class VircManager:
         # remove old config files
         if os.path.exists(self.build_base_dir):
             shutil.rmtree(self.build_base_dir)
+        if os.path.exists(self.launch_base_dir):
+            shutil.rmtree(self.launch_base_dir)
 
         # build file links
         build_files = []
@@ -91,7 +93,7 @@ class VircManager:
             # launch folder
             os.makedirs(server_launch_folder)
 
-            lf = server.write_build_files(server_launch_folder,
+            lf = server.write_launch_files(server_launch_folder,
                                           server_src_folder,
                                           server_bin_folder,
                                           guest_build_folder,
