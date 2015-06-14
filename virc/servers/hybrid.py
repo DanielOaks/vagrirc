@@ -85,3 +85,20 @@ class HybridServer(BaseServer):
         output_config_file = os.path.join(output_config_dir, 'reference.conf')
         with open(output_config_file, 'w') as config_file:
             config_file.write(config_data)
+
+    def write_build_files(self, folder, src_folder, bin_folder, build_folder):
+        """Write build files to the given folder."""
+        # load original config file
+        build_file = """#!/usr/bin/env sh
+mv {src_folder}
+./configure --prefix={bin_folder}
+make
+make install
+""".format(src_folder=src_folder, bin_folder=bin_folder)
+
+        build_filename = os.path.join(folder, 'build.sh')
+
+        with open(build_filename, 'w') as b_file:
+            b_file.write(build_file)
+
+        return True

@@ -50,4 +50,7 @@ Vagrant.configure(2) do |config|
     puppet.manifest_file = ""
   end
 
+  # provision IRC software!
+  config.vm.provision "shell", inline: "/irc/build/build.sh"
+
 end

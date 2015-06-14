@@ -64,20 +64,37 @@ class VircManager:
             elif node.service_bot:
                 server = service_bots.available[node.software]()
 
-            server_build_folder = os.path.join(self.build_base_dir, '{}_{}'.format(server._slug_type, node.software), node.folder_slug)
+            server_slug = '{}_{}'.format(server._slug_type, node.software)
 
-            server.write_build_files(server_build_folder)
+            server_build_folder = os.path.join(self.build_base_dir, server_slug)
+            server_bin_folder = os.path.join('/irc/bin', server_slug)
+            server_src_folder = os.path.join('/irc/src', server_slug)
+            guest_build_folder = os.path.join('/irc/build', server_slug)
 
-    def write_software_source(self):
+            os.makedirs(server_build_folder)
+
+            bf = server.write_build_files(server_build_folder,
+                                          server_src_folder,
+                                          server_bin_folder,
+                                          guest_build_folder,)
+
+            if bf:
+                build_file = os.path.join('/irc/build', server_slug, 'build.sh')
+                build_files.append(build_file)
+
+        # write build files
+        with open(os.path.join(self.build_base_dir, 'build.sh'), 'w') as build_file:
+            build_file.write('#!/usr/bin/env sh\n')
+            for filename in build_files:
+                build_file.write(filename + '\n')
+
+    def write_source_files(self):
         """Write software files."""
         # remove old config files
         if os.path.exists(self.src_base_dir):
             shutil.rmtree(self.src_base_dir)
 
         # write software folders
-        sw_types = []
-        sw = []
-
         for node in self.network.nodes():
             if node.client:
                 server = servers.available[node.software]()
@@ -86,12 +103,9 @@ class VircManager:
             elif node.service_bot:
                 server = service_bots.available[node.software]()
 
-            if node.software in sw_types:
-                continue
-            else:
-                sw_types.append(node.software)
+            server_slug = '{}_{}'.format(server._slug_type, node.software)
+            src_folder = os.path.join(self.src_base_dir, server_slug)
 
-            src_folder = os.path.join(self.src_base_dir, server.external_source_folder)
             shutil.copytree(server.source_folder, src_folder)
 
     def write_server_configs(self):

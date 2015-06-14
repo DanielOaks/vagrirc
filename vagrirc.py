@@ -43,4 +43,5 @@ if __name__ == '__main__':
         manager = virc.VircManager()
         manager.load_network_map()
         manager.write_server_configs()
-        manager.write_software()
+        manager.write_source_files()
+        manager.write_build_files()

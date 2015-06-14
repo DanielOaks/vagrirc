@@ -111,6 +111,10 @@ class BaseServer(ReleaseDownloader):
         """Write config file to the given folder."""
         ...
 
+    def write_build_files(self, folder, src_folder, bin_folder, build_folder):
+        """Write build files to the given folder."""
+        ...
+
 
 class BaseServices(ReleaseDownloader):
     _slug_type = 'services'
@@ -120,6 +124,10 @@ class BaseServices(ReleaseDownloader):
         """Write config file to the given folder."""
         ...
 
+    def write_build_files(self, folder, src_folder, bin_folder, build_folder):
+        """Write build files to the given folder."""
+        ...
+
 
 class BaseServiceBot(ReleaseDownloader):
     _slug_type = 'servicebot'
@@ -127,4 +135,8 @@ class BaseServiceBot(ReleaseDownloader):
 
     def write_config(self, folder):
         """Write config file to the given folder."""
+        ...
+
+    def write_build_files(self, folder, src_folder, bin_folder, build_folder):
+        """Write build files to the given folder."""
         ...
