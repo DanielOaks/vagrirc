@@ -75,7 +75,7 @@ class VircManager:
             server_bin_folder = os.path.join('/irc/bin', server_slug)
             server_src_folder = os.path.join('/irc/src', server_slug)
             guest_build_folder = os.path.join('/irc/build', server_slug)
-            guest_config_folder = os.path.join('/irc/configs', server_slug, node.folder_slug)
+            guest_config_folder = os.path.join('/irc/configs', server_slug)
 
             # build folder
             os.makedirs(server_build_folder)
@@ -179,7 +179,7 @@ class VircManager:
 
                 server.info['links'].append(info)
 
-            server_config_folder = os.path.join(self.configs_base_dir, '{}_{}'.format(server._slug_type, node.software), node.folder_slug)
+            server_config_folder = os.path.join(self.configs_base_dir, '{}_{}'.format(server._slug_type, node.software))
 
             server.write_config(server_config_folder)
 
