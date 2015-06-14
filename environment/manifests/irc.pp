@@ -1,6 +1,7 @@
 # Setting up the various databases we use
-mysql::db { 'acid':
+mysql::db { 'acidcore':
   user     => 'acid',
   password => 'acidpass',
   host     => 'localhost',
+  port     => 3306,
 }

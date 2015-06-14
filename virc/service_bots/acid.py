@@ -35,11 +35,11 @@ class AcidServiceBot(BaseServiceBot):
         if not os.path.exists(output_config_dir):
             os.makedirs(output_config_dir)
 
-        # shouldn't need to change this
+        # pyva-native compilation makefile
         orig, new = config_files['pyva-native']
         shutil.copyfile(orig, new)
 
-        # load original config file
+        # aciditive config file
         orig, new = config_files['acid']
         with open(orig, 'r') as config_file:
             config_data = config_file.read()
@@ -50,6 +50,13 @@ class AcidServiceBot(BaseServiceBot):
         conf['uplink']['host'] = '127.0.0.1'
         conf['uplink']['pass'] = self.info['links'][0]['password']
         conf['uplink']['port'] = self.info['links'][0]['remote_port']
+
+        conf['database'][0]['host'] = 'jdbc:mysql://127.0.0.1:3306/acidcore?autoReconnect=true'
+        conf['database'][0]['name'] = 'acidcore'
+        conf['database'][0]['user'] = 'acid'
+        conf['database'][0]['pass'] = 'acidpass'
+
+        conf['debug'] = True
 
         # and writing it out
         with open(new, 'w') as config_file:

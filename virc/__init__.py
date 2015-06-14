@@ -35,6 +35,7 @@ class VircManager:
         self.map_filename = os.path.join(self.irc_dir, 'Server Map.pdf')
         self.serial_filename = os.path.join(self.irc_dir, 'map.yaml')
         self.configs_base_dir = os.path.join(self.irc_dir, 'configs')
+        self.build_base_dir = os.path.join(self.irc_dir, 'build')
         self.src_base_dir = os.path.join(self.irc_dir, 'src')
         self.bin_base_dir = os.path.join(self.irc_dir, 'bin')
 
@@ -45,6 +46,53 @@ class VircManager:
     def load_network_map(self):
         with open(self.serial_filename, 'r') as serial_file:
             self.network = serial.load(serial_file.read())
+
+    def write_build_files(self):
+        """Write necessary build files for our software."""
+        # remove old config files
+        if os.path.exists(self.build_base_dir):
+            shutil.rmtree(self.build_base_dir)
+
+        # build file links
+        build_files = []
+
+        for node in self.network.nodes():
+            if node.client:
+                server = servers.available[node.software]()
+            elif node.services:
+                server = services.available[node.software]()
+            elif node.service_bot:
+                server = service_bots.available[node.software]()
+
+            server_build_folder = os.path.join(self.build_base_dir, '{}_{}'.format(server._slug_type, node.software), node.folder_slug)
+
+            server.write_build_files(server_build_folder)
+
+    def write_software_source(self):
+        """Write software files."""
+        # remove old config files
+        if os.path.exists(self.src_base_dir):
+            shutil.rmtree(self.src_base_dir)
+
+        # write software folders
+        sw_types = []
+        sw = []
+
+        for node in self.network.nodes():
+            if node.client:
+                server = servers.available[node.software]()
+            elif node.services:
+                server = services.available[node.software]()
+            elif node.service_bot:
+                server = service_bots.available[node.software]()
+
+            if node.software in sw_types:
+                continue
+            else:
+                sw_types.append(node.software)
+
+            src_folder = os.path.join(self.src_base_dir, server.external_source_folder)
+            shutil.copytree(server.source_folder, src_folder)
 
     def write_server_configs(self):
         """Write config files for all our servers."""

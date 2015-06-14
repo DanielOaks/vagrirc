@@ -32,6 +32,7 @@ class ReleaseDownloader:
         if self.release is None and self.vcs:
             self.release = 'trunk'
         self.source_folder = os.path.join(self.cache_directory, self.release)
+        self.external_source_folder = self.name
 
         if not os.path.exists(self.cache_directory):
             os.makedirs(self.cache_directory)
