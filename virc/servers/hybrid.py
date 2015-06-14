@@ -30,6 +30,7 @@ config_initial_regexes = [
 
     # basic config options
     re.compile(r'\n\s*havent_read_conf.+'),
+    re.compile(r'need_ident'),
 ]
 
 config_regexes = {
@@ -108,7 +109,7 @@ cp {config_folder}/etc/reference.conf {bin_folder}/etc/ircd.conf
     def write_launch_files(self, folder, src_folder, bin_folder, build_folder, config_folder):
         """Write launch files to the given folder."""
         launch_file = """#!/usr/bin/env sh
-{bin_folder}/bin/ircd &
+{bin_folder}/bin/ircd
 """.format(src_folder=src_folder, bin_folder=bin_folder, config_folder=config_folder)
 
         launch_filename = os.path.join(folder, 'launch.sh')

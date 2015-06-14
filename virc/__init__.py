@@ -287,9 +287,9 @@ class VircManager:
             info = {}
 
             # generate name
-            server_name = names.get_first_name().lower()
+            server_name = names.get_first_name().lower() + '.dnt'
             while server_name in used_names:
-                server_name = names.get_first_name().lower()
+                server_name = names.get_first_name().lower() + '.dnt'
             used_names.append(server_name)
 
             info['name'] = server_name
