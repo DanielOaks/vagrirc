@@ -86,19 +86,34 @@ class HybridServer(BaseServer):
         with open(output_config_file, 'w') as config_file:
             config_file.write(config_data)
 
-    def write_build_files(self, folder, src_folder, bin_folder, build_folder):
+    def write_build_files(self, folder, src_folder, bin_folder, build_folder, config_folder):
         """Write build files to the given folder."""
-        # load original config file
         build_file = """#!/usr/bin/env sh
-mv {src_folder}
+cd {src_folder}
+chmod +x ./configure
 ./configure --prefix={bin_folder}
 make
 make install
-""".format(src_folder=src_folder, bin_folder=bin_folder)
+
+cp {config_folder}/etc/reference.conf {bin_folder}/etc/ircd.conf
+""".format(src_folder=src_folder, bin_folder=bin_folder, config_folder=config_folder)
 
         build_filename = os.path.join(folder, 'build.sh')
 
         with open(build_filename, 'w') as b_file:
             b_file.write(build_file)
+
+        return True
+
+    def write_launch_files(self, folder, src_folder, bin_folder, build_folder, config_folder):
+        """Write launch files to the given folder."""
+        launch_file = """#!/usr/bin/env sh
+{bin_folder}/bin/ircd &
+""".format(src_folder=src_folder, bin_folder=bin_folder, config_folder=config_folder)
+
+        launch_filename = os.path.join(folder, 'launch.sh')
+
+        with open(launch_filename, 'w') as b_file:
+            l_file.write(launch_file)
 
         return True

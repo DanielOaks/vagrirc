@@ -3,5 +3,4 @@ mysql::db { 'acidcore':
   user     => 'acid',
   password => 'acidpass',
   host     => 'localhost',
-  port     => 3306,
 }

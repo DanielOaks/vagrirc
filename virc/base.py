@@ -111,8 +111,12 @@ class BaseServer(ReleaseDownloader):
         """Write config file to the given folder."""
         ...
 
-    def write_build_files(self, folder, src_folder, bin_folder, build_folder):
+    def write_build_files(self, folder, src_folder, bin_folder, build_folder, config_folder):
         """Write build files to the given folder."""
+        ...
+
+    def write_launch_files(self, folder, src_folder, bin_folder, build_folder, config_folder):
+        """Write launch files to the given folder."""
         ...
 
 
@@ -124,8 +128,12 @@ class BaseServices(ReleaseDownloader):
         """Write config file to the given folder."""
         ...
 
-    def write_build_files(self, folder, src_folder, bin_folder, build_folder):
+    def write_build_files(self, folder, src_folder, bin_folder, build_folder, config_folder):
         """Write build files to the given folder."""
+        ...
+
+    def write_launch_files(self, folder, src_folder, bin_folder, build_folder, config_folder):
+        """Write launch files to the given folder."""
         ...
 
 
@@ -137,6 +145,10 @@ class BaseServiceBot(ReleaseDownloader):
         """Write config file to the given folder."""
         ...
 
-    def write_build_files(self, folder, src_folder, bin_folder, build_folder):
+    def write_build_files(self, folder, src_folder, bin_folder, build_folder, config_folder):
         """Write build files to the given folder."""
+        ...
+
+    def write_launch_files(self, folder, src_folder, bin_folder, build_folder, config_folder):
+        """Write launch files to the given folder."""
         ...

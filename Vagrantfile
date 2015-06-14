@@ -42,7 +42,7 @@ Vagrant.configure(2) do |config|
 
   config.vm.provision "puppet" do |puppet|
     # if we don't do this, MySQL breaks
-    puppet.facter = { 
+    puppet.facter = {
       "fqdn" => "localhost",
     }
     puppet.options = ['--modulepath=/tmp/modules']
@@ -51,6 +51,9 @@ Vagrant.configure(2) do |config|
   end
 
   # provision IRC software!
-  config.vm.provision "shell", inline: "/irc/build/build.sh"
+  config.vm.provision "shell", inline: "chmod +x /irc/build/build.sh && /irc/build/build.sh"
+  config.vm.provision "shell", inline: "chmod +x /irc/launch/launch.sh && /irc/launch/launch.sh"
+
+  puts "Your IRC server should now be accessible from irc://localhost:9997/"
 
 end

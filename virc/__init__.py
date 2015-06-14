@@ -36,6 +36,7 @@ class VircManager:
         self.serial_filename = os.path.join(self.irc_dir, 'map.yaml')
         self.configs_base_dir = os.path.join(self.irc_dir, 'configs')
         self.build_base_dir = os.path.join(self.irc_dir, 'build')
+        self.launch_base_dir = os.path.join(self.irc_dir, 'launch')
         self.src_base_dir = os.path.join(self.irc_dir, 'src')
         self.bin_base_dir = os.path.join(self.irc_dir, 'bin')
 
@@ -55,6 +56,7 @@ class VircManager:
 
         # build file links
         build_files = []
+        launch_files = []
 
         for node in self.network.nodes():
             if node.client:
@@ -67,26 +69,51 @@ class VircManager:
             server_slug = '{}_{}'.format(server._slug_type, node.software)
 
             server_build_folder = os.path.join(self.build_base_dir, server_slug)
+            server_launch_folder = os.path.join(self.launch_base_dir, server_slug)
             server_bin_folder = os.path.join('/irc/bin', server_slug)
             server_src_folder = os.path.join('/irc/src', server_slug)
             guest_build_folder = os.path.join('/irc/build', server_slug)
+            guest_config_folder = os.path.join('/irc/configs', server_slug, node.folder_slug)
 
+            # build folder
             os.makedirs(server_build_folder)
 
             bf = server.write_build_files(server_build_folder,
                                           server_src_folder,
                                           server_bin_folder,
-                                          guest_build_folder,)
+                                          guest_build_folder,
+                                          guest_config_folder,)
 
             if bf:
                 build_file = os.path.join('/irc/build', server_slug, 'build.sh')
                 build_files.append(build_file)
 
+            # launch folder
+            os.makedirs(server_launch_folder)
+
+            lf = server.write_build_files(server_launch_folder,
+                                          server_src_folder,
+                                          server_bin_folder,
+                                          guest_build_folder,
+                                          guest_config_folder,)
+
+            if lf:
+                launch_file = os.path.join('/irc/launch', server_slug, 'launch.sh')
+                launch_files.append(launch_file)
+
         # write build files
         with open(os.path.join(self.build_base_dir, 'build.sh'), 'w') as build_file:
             build_file.write('#!/usr/bin/env sh\n')
             for filename in build_files:
+                build_file.write('chmod +x ' + filename + '\n')
                 build_file.write(filename + '\n')
+
+        # write launch files
+        with open(os.path.join(self.launch_base_dir, 'launch.sh'), 'w') as launch_file:
+            launch_file.write('#!/usr/bin/env sh\n')
+            for filename in launch_files:
+                launch_file.write('chmod +x ' + filename + '\n')
+                launch_file.write(filename + '\n')
 
     def write_source_files(self):
         """Write software files."""
