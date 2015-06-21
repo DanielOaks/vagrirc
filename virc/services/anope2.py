@@ -86,6 +86,8 @@ cmake '-DINSTDIR:STRING={bin_folder}' -DCMAKE_BUILD_TYPE:STRING=DEBUG -DUSE_RUN_
 
 make
 make install
+
+cp /irc/configs/services_anope2/conf/services.conf /irc/bin/services_anope2/conf/services.conf
 """.format(src_folder=src_folder, bin_folder=bin_folder, config_folder=config_folder)
 
         build_filename = os.path.join(folder, 'build.sh')
