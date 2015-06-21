@@ -54,6 +54,7 @@ Vagrant.configure(2) do |config|
   config.vm.provision "shell", inline: "chmod +x /irc/build/build.sh && /irc/build/build.sh"
   config.vm.provision "shell", inline: "chmod +x /irc/launch/launch.sh && /irc/launch/launch.sh"
 
-  puts "Your IRC server should now be accessible from irc://localhost:9997/"
+  # tell them where to go
+  config.vm.post_up_message "Your IRC server should now be accessible from irc://localhost:9997/"
 
 end
