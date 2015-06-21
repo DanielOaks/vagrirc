@@ -17,7 +17,7 @@ config_initial_replacements = [
 ]
 
 config_replacements = {
-    'name': ('services.localhost.net', r'{value}'),
+    'name': ('services.localhost.net', '{value}'),
     'sid': ('#id = "00A"', 'id = "{value}"'),
     'network_name': ('networkname = "LocalNet"', 'networkname = "{value}"'),
 }
