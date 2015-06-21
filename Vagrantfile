@@ -5,6 +5,7 @@ Vagrant.configure(2) do |config|
 
   # We use Centos because it's a nice, stable, and works well.
   config.vm.box = "chef/centos-6.6"
+  config.vm.box_check_update = false  # you can check this manually
 
   # Hostname
   config.vm.hostname = "vagrirc"
@@ -16,6 +17,8 @@ Vagrant.configure(2) do |config|
   # Cache packages so we don't spend a million years downloading
   #   each time we startup
   if Vagrant.has_plugin?("vagrant-cachier")
+    config.cache.enable :yum
+    config.cache.enable :gem
     config.cache.scope = :box
     config.cache.synced_folder_opts = {
       type: :nfs,
@@ -55,6 +58,6 @@ Vagrant.configure(2) do |config|
   config.vm.provision "shell", inline: "chmod +x /irc/launch/launch.sh && /irc/launch/launch.sh"
 
   # tell them where to go
-  config.vm.post_up_message "Your IRC server should now be accessible from irc://localhost:9997/"
+  config.vm.post_up_message = "Your IRC server should now be accessible from irc://localhost:9997/"
 
 end
