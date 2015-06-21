@@ -118,4 +118,5 @@ target/
 
 ### Virc ###
 /irc/*
+/environment/cache/*
 

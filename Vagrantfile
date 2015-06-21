@@ -36,9 +36,16 @@ Vagrant.configure(2) do |config|
   config.vm.synced_folder "./irc", "/irc", :nfs => enable_nfs
   config.vm.synced_folder "./environment", "/environment", :nfs => enable_nfs
 
-  # We use Puppet to provision MySQL and such
-  config.vm.provision "shell", path: "environment/shell/core.sh"
+  # Base Software Provisioning
+  # these files are split up like this so vagrant-cachier can do its work
+  config.vm.provision "shell", path: "environment/shell/1.perl.sh"
+  config.vm.provision "shell", path: "environment/shell/2.repos.1.init.sh"
+  config.vm.provision "shell", path: "environment/shell/2.repos.2.packages.sh"
+  config.vm.provision "shell", path: "environment/shell/3.ruby.1.init.sh"
+  config.vm.provision "shell", path: "environment/shell/3.ruby.2.update.sh"
+  config.vm.provision "shell", path: "environment/shell/4.puppet.sh"
 
+  # Puppet
   config.vm.provision "shell", inline: "gem install librarian-puppet"
   config.vm.provision "shell", inline: "cp /environment/Puppetfile /tmp"
   config.vm.provision "shell", inline: "cd /tmp && librarian-puppet install --verbose"
@@ -54,8 +61,8 @@ Vagrant.configure(2) do |config|
   end
 
   # provision IRC software!
-  config.vm.provision "shell", inline: "chmod +x /irc/build/build.sh && /irc/build/build.sh"
-  config.vm.provision "shell", inline: "chmod +x /irc/launch/launch.sh && /irc/launch/launch.sh"
+  config.vm.provision "shell", inline: "chmod +x /irc/build/build.sh && /irc/build/build.sh", privileged: false
+  config.vm.provision "shell", inline: "chmod +x /irc/launch/launch.sh && /irc/launch/launch.sh", privileged: false
 
   # tell them where to go
   config.vm.post_up_message = "Your IRC server should now be accessible from irc://localhost:9997/"
