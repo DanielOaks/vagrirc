@@ -13,7 +13,6 @@ config_initial_replacements = [
     (re.compile(r'\n(?:\s*\n)+'), r'\n'),  # remove blank lines
     (re.compile(r'^[\s\n]*([\S\s]*?)[\s\n]*$'), r'\1\n'),  # remove start/end blank space, make sure newline at end
     ('usemail = yes', 'usemail = no'),  # we don't use mail
-    ('name = "inspircd20"', 'name = "hybrid"'),  # we only have hybrid for now
 ]
 
 config_replacements = {
@@ -63,6 +62,17 @@ class Anope2Services(BaseServices):
                     config_data = rep.sub(sub, config_data)
             else:
                 print('anope2 config: skipping key:', key)
+
+        # external ircd module to load
+        server_sw = self.info['links'][0]['server_software']
+        if server_sw == 'hybrid':
+            server_sw_name = 'hybrid'
+        elif server_sw == 'inspircd':
+            server_sw_name = 'inspircd20'
+        else:
+            raise Exception('unknown server sw in anope config setting: [{}]'.format(server_sw))
+
+        config_data = config_data.replace('name = "inspircd20"', 'name = "{}"'.format(server_sw_name))
 
         # writing out config file
         output_config_dir = os.path.join(folder, 'conf')

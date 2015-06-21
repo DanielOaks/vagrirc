@@ -177,6 +177,12 @@ class VircManager:
                         else:
                             info['remote_port'] = v
 
+                if not node.client:
+                    if link[0].client:
+                        info['server_software'] = link[0].software
+                    elif link[1].client:
+                        info['server_software'] = link[1].software
+
                 server.info['links'].append(info)
 
             server_config_folder = os.path.join(self.configs_base_dir, '{}_{}'.format(server._slug_type, node.software))
@@ -287,17 +293,15 @@ class VircManager:
             info = {}
 
             # generate name
-            server_name = names.get_first_name().lower() + '.dnt'
+            if server.services:
+                server_name = 'services'
+            else:
+                server_name = server.software
             while server_name in used_names:
-                server_name = names.get_first_name().lower() + '.dnt'
+                server_name = names.get_first_name().lower()
             used_names.append(server_name)
 
-            info['name'] = server_name
-
-            if server.services:
-                info['name'] += '.services'
-            elif server.service_bot:
-                info['name'] += '.service.bot'
+            info['name'] = server_name + '.dnt'
 
             # generate sid
             sid = '72A'
