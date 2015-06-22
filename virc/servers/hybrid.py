@@ -30,14 +30,29 @@ config_initial_regexes = [
 
     # basic config options
     re.compile(r'\n\s*havent_read_conf.+'),
-    re.compile(r'need_ident'),
+    re.compile(r'\n\s*flags = need_ident;'),
 ]
 
 config_regexes = {
     'name': (re.compile(r'(serverinfo \{\n\s*name = )[^\;]+(;)'), r'\1"{value}"\2'),
     'sid': (re.compile(r'(\n\s*sid = )"[0-9a-zA-Z]{3}"(;)'), r'\1"{value}"\2'),
-    'client_port': (re.compile(r'(\nauth \{[^\}]+\};)'), r'\1\nlisten{{\n    port = {value};\n}};')
 }
+
+CONN_BLOCK = r"""connect {{
+    name = "{remote_name}";
+    host = "127.0.0.1";
+    send_password = "{password}";
+    accept_password = "{password}";
+    encrypted = no;
+    port = {port};
+}};"""
+
+LISTEN_BLOCK = r"""\1\nlisten {{
+    port = {client_port};
+    flags = hidden;
+    port = {link_ports};
+}};
+{connect_blocks}"""
 
 
 class HybridServer(BaseServer):
@@ -76,6 +91,26 @@ class HybridServer(BaseServer):
                 config_data = regex.sub(sub, config_data)
             else:
                 print('hybrid regex: skipping key:', key)
+
+        # listening ports
+        lregex = re.compile(r'(\nauth \{[^\}]+\};)')
+
+        connect_blocks = []
+
+        ports = []
+        for link in self.info['links']:
+            ports.append(str(link['port']))
+            connect_blocks.append(CONN_BLOCK.format(remote_name=link['remote_name'],
+                                                    password=link['password'],
+                                                    port=link['port']))
+
+        link_ports = ', '.join(ports)
+
+        sub = LISTEN_BLOCK.format(client_port=self.info['client_port'],
+                                  link_ports=link_ports,
+                                  connect_blocks='\n'.join(connect_blocks))
+
+        config_data = lregex.sub(sub, config_data)
 
         # writing out config file
         output_config_dir = os.path.join(folder, 'etc')

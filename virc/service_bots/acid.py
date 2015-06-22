@@ -49,7 +49,7 @@ class AcidServiceBot(BaseServiceBot):
         # setting info
         conf['uplink']['host'] = '127.0.0.1'
         conf['uplink']['pass'] = self.info['links'][0]['password']
-        conf['uplink']['port'] = self.info['links'][0]['remote_port']
+        conf['uplink']['port'] = self.info['links'][0]['port']
 
         conf['database'][0]['host'] = 'jdbc:mysql://127.0.0.1:3306/acidcore?autoReconnect=true'
         conf['database'][0]['name'] = 'acidcore'

@@ -170,12 +170,10 @@ class VircManager:
 
                 info = {k: v for (k,v) in link_info}
 
-                for k, v in dict(info).items():
-                    if k.endswith('_port'):
-                        if k.startswith(server.info['sid']):
-                            info['my_port'] = v
-                        else:
-                            info['remote_port'] = v
+                if link[0] == node:
+                    info['remote_name'] = link[1].info['name']
+                elif link[1] == node:
+                    info['remote_name'] = link[0].info['name']
 
                 if not node.client:
                     if link[0].client:
@@ -320,9 +318,9 @@ class VircManager:
             server.info = info
 
         # assign ports and passwords for server links
-        current_server_port = 10000
-        while current_server_port <= current_client_port:
-            current_server_port += 500
+        current_link_port = 10000
+        while current_link_port <= current_client_port:
+            current_link_port += 500
 
         used_passwords = []
 
@@ -330,10 +328,8 @@ class VircManager:
             info = []
 
             # port for things to connect on
-            info.append(('{}_port'.format(link[0].info['sid']), current_server_port))
-            current_server_port += 1
-            info.append(('{}_port'.format(link[1].info['sid']), current_server_port))
-            current_server_port += 1
+            info.append(('port', current_link_port))
+            current_link_port += 1
 
             # generate link password
             password = '{}_{}'.format(names.get_last_name().lower(), random.randint(0, 9999))
