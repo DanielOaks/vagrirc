@@ -12,4 +12,4 @@ Actually create the server.
 
 License
 -------
-Public Domain, except for part of ``environment/shell/core.sh`` which is from the `PuPHPet <https://github.com/puphpet/puphpet>`_ project, which is licensed under the `MIT License <http://opensource.org/licenses/mit-license.php>`_.
+Public Domain, except for part of ``environment/shell/*.sh`` core files which are from the `PuPHPet <https://github.com/puphpet/puphpet>`_ project, which is licensed under the `MIT License <http://opensource.org/licenses/mit-license.php>`_.
