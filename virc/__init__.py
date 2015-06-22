@@ -101,7 +101,12 @@ class VircManager:
 
             if lf:
                 launch_file = os.path.join('/irc/launch', server_slug, 'launch.sh')
-                launch_files.append(launch_file)
+                # XXX - to create a proper dependency manager solution here
+                # or just be lazy and do a launch priority
+                if node.client:
+                    launch_files = [launch_file] + launch_files
+                else:
+                    launch_files.append(launch_file)
 
         # write build files
         with open(os.path.join(self.build_base_dir, 'build.sh'), 'w') as build_file:

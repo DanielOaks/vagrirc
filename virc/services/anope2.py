@@ -123,3 +123,16 @@ cp /irc/configs/services_anope2/conf/services.conf /irc/bin/services_anope2/conf
             b_file.write(build_file)
 
         return True
+
+    def write_launch_files(self, folder, src_folder, bin_folder, build_folder, config_folder):
+        """Write launch files to the given folder."""
+        launch_file = """#!/usr/bin/env sh
+{bin_folder}/bin/services
+""".format(src_folder=src_folder, bin_folder=bin_folder, config_folder=config_folder)
+
+        launch_filename = os.path.join(folder, 'launch.sh')
+
+        with open(launch_filename, 'w') as l_file:
+            l_file.write(launch_file)
+
+        return True
