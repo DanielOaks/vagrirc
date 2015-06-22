@@ -6,7 +6,7 @@ import re
 from ..base import BaseServer
 
 # Removal Regexes
-config_initial_regexes = [
+config_initial_replacements = [
     re.compile(r'/\*(.|[\r\n])*?\*/'),  # c style comments
     re.compile(r'\n\s*//.*'),  # c++ style comments
     re.compile(r'\n\s*#.*'),  # shell style comments
@@ -31,11 +31,13 @@ config_initial_regexes = [
     # basic config options
     re.compile(r'\n\s*havent_read_conf.+'),
     re.compile(r'\n\s*flags = need_ident;'),
+    ('hub = no;', 'hub = yes;'),
 ]
 
-config_regexes = {
+config_replacements = {
     'name': (re.compile(r'(serverinfo \{\n\s*name = )[^\;]+(;)'), r'\1"{value}"\2'),
     'sid': (re.compile(r'(\n\s*sid = )"[0-9a-zA-Z]{3}"(;)'), r'\1"{value}"\2'),
+    'network_name': (r'MyNet', r'{value}'),
 }
 
 CONN_BLOCK = r"""connect {{
@@ -69,26 +71,30 @@ class HybridServer(BaseServer):
             config_data = config_file.read()
 
         # removing useless junk
-        for regex in config_initial_regexes:
+        for rep in config_initial_replacements:
             # replacement
-            if isinstance(regex, (list, tuple)):
-                regex, sub = regex
+            if isinstance(rep, (list, tuple)):
+                rep, sub = rep
 
             # removal
             else:
                 sub = ''
 
-            config_data = regex.sub(sub, config_data)
-
-        # special stuff
-        config_data = config_data.replace('hub = no;', 'hub = yes;')
+            if isinstance(rep, str):
+                config_data = config_data.replace(rep, sub)
+            else:
+                config_data = rep.sub(sub, config_data)
 
         # inserting actual values
         for key, value in self.info.items():
-            if key in config_regexes:
-                regex, sub = config_regexes[key]
+            if key in config_replacements:
+                rep, sub = config_replacements[key]
                 sub = sub.format(value=value)
-                config_data = regex.sub(sub, config_data)
+
+                if isinstance(rep, str):
+                    config_data = config_data.replace(rep, sub)
+                else:
+                    config_data = rep.sub(sub, config_data)
             else:
                 print('hybrid regex: skipping key:', key)
 

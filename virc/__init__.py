@@ -153,6 +153,10 @@ class VircManager:
                 server = service_bots.available[node.software]()
 
             server.info = node.info
+
+            # may be configurable later
+            server.info['network_name'] = 'VagrIRC'
+
             server.info['links'] = []
             for link in self.network.edges():
                 # only write link info for this node

@@ -21,6 +21,16 @@ config_replacements = {
     'network_name': ('networkname = "LocalNet"', 'networkname = "{value}"'),
 }
 
+UPLINK_BLOCK = r"""uplink
+{{
+    host = "127.0.0.1"
+    ipv6 = no
+    ssl = no
+    port = {port}
+    password = "{password}"
+}}
+"""
+
 
 class Anope2Services(BaseServices):
     """Implements support for Anope2 Services."""
@@ -67,12 +77,19 @@ class Anope2Services(BaseServices):
         server_sw = self.info['links'][0]['server_software']
         if server_sw == 'hybrid':
             server_sw_name = 'hybrid'
+            config_data = config_data.replace('casemap = "ascii"', 'casemap = "rfc1459"')
         elif server_sw == 'inspircd':
             server_sw_name = 'inspircd20'
         else:
             raise Exception('unknown server sw in anope config setting: [{}]'.format(server_sw))
 
         config_data = config_data.replace('name = "inspircd20"', 'name = "{}"'.format(server_sw_name))
+
+        # replacing uplink block
+        uplink_regex = re.compile(r'uplink[\s\n]*\{[^\}]+\}')
+        uplink = UPLINK_BLOCK.format(port=self.info['links'][0]['port'],
+                                     password=self.info['links'][0]['password'])
+        config_data = uplink_regex.sub(uplink, config_data)
 
         # writing out config file
         output_config_dir = os.path.join(folder, 'conf')
