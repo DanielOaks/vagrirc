@@ -20,15 +20,18 @@ Vagrant.configure(2) do |config|
     config.cache.enable :yum
     config.cache.enable :gem
     config.cache.scope = :box
-    config.cache.synced_folder_opts = {
-      type: :nfs,
-      mount_options: ['rw', 'vers=3', 'tcp', 'nolock']
-    }
   end
 
   # Folder for IRC stuff.
   if RUBY_PLATFORM.downcase.include?("darwin") or RUBY_PLATFORM.downcase.include?("linux")
     enable_nfs = true
+
+    if Vagrant.has_plugin?("vagrant-cachier")
+      config.cache.synced_folder_opts = {
+        type: :nfs,
+        mount_options: ['rw', 'vers=3', 'tcp', 'nolock']
+      }
+    end
   else
     enable_nfs = false
   end
