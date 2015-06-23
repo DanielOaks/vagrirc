@@ -39,4 +39,8 @@ fi
 yum -y --nogpgcheck install "${EL_REPO_CACHE}" >/dev/null
 yum -y --nogpgcheck install "${EPEL_CACHE}" >/dev/null
 yum -y install centos-release-SCL >/dev/null
+
+yum clean all >/dev/null
+yum -y check-update >/dev/null
+echo 'Finished adding repos: elrep, epel, scl'
 # Unfinished End of PuPHPet Initial Setup <<<
