@@ -14,6 +14,15 @@ class AcidServiceBot(BaseServiceBot):
     vcs = 'git'
     url = 'https://gitlab.com/rizon/acid.git'
 
+    def init_info(self):
+        """Create our info."""
+        self.info['users'] = {
+            'moo': {
+                'nickserv_pass': 'moomoo',
+                'email': 'moo@example.com',
+            }
+        }
+
     def write_config(self, folder):
         """Write config file to the given folder."""
         config_files = {

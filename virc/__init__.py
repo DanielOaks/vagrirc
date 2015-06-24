@@ -37,8 +37,11 @@ class VircManager:
         self.configs_base_dir = os.path.join(self.irc_dir, 'configs')
         self.build_base_dir = os.path.join(self.irc_dir, 'build')
         self.launch_base_dir = os.path.join(self.irc_dir, 'launch')
+        self.init_base_dir = os.path.join(self.irc_dir, 'init')
         self.src_base_dir = os.path.join(self.irc_dir, 'src')
         self.bin_base_dir = os.path.join(self.irc_dir, 'bin')
+
+        self.network_name = 'VagrIRC'
 
     def save_network_map(self):
         with open(self.serial_filename, 'w') as serial_file:
@@ -47,6 +50,29 @@ class VircManager:
     def load_network_map(self):
         with open(self.serial_filename, 'r') as serial_file:
             self.network = serial.load(serial_file.read())
+
+    def write_init_files(self):
+        """Write necessary init files for our software."""
+        # remove old config files
+        if os.path.exists(self.init_base_dir):
+            shutil.rmtree(self.init_base_dir)
+
+        # info
+        users = {
+            'dan': {
+                'oper': True,
+                'ircd_pass': 'qwerty',
+                'nickserv_pass': 'qwertyuiop',
+                'email': 'dan@example.com',
+            }
+        }
+
+        server_list = self.server_list()
+
+        for node, server in server_list:
+            users.update(server.info['users'])
+
+        # for node, server in server_list:
 
     def write_build_files(self):
         """Write necessary build files for our software."""
@@ -60,14 +86,7 @@ class VircManager:
         build_files = []
         launch_files = []
 
-        for node in self.network.nodes():
-            if node.client:
-                server = servers.available[node.software]()
-            elif node.services:
-                server = services.available[node.software]()
-            elif node.service_bot:
-                server = service_bots.available[node.software]()
-
+        for node, server in self.server_list():
             server_slug = '{}_{}'.format(server._slug_type, node.software)
 
             server_build_folder = os.path.join(self.build_base_dir, server_slug)
@@ -129,14 +148,7 @@ class VircManager:
             shutil.rmtree(self.src_base_dir)
 
         # write software folders
-        for node in self.network.nodes():
-            if node.client:
-                server = servers.available[node.software]()
-            elif node.services:
-                server = services.available[node.software]()
-            elif node.service_bot:
-                server = service_bots.available[node.software]()
-
+        for node, server in self.server_list():
             server_slug = '{}_{}'.format(server._slug_type, node.software)
             src_folder = os.path.join(self.src_base_dir, server_slug)
 
@@ -149,52 +161,69 @@ class VircManager:
             shutil.rmtree(self.configs_base_dir)
 
         # write new config files
-        for node in self.network.nodes():
-            if node.client:
-                server = servers.available[node.software]()
-            elif node.services:
-                server = services.available[node.software]()
-            elif node.service_bot:
-                server = service_bots.available[node.software]()
-
-            server.info = node.info
-
-            # may be configurable later
-            server.info['network_name'] = 'VagrIRC'
-
-            server.info['links'] = []
-            for link in self.network.edges():
-                # only write link info for this node
-                if link[0] != node and link[1] != node:
-                    continue
-
-                base_info = nx.get_edge_attributes(self.network, link)
-                if not base_info:
-                    base_info = nx.get_edge_attributes(self.network, (link[1], link[0]))
-
-                try:
-                    link_info = base_info[link]
-                except KeyError:
-                    link_info = base_info[(link[1], link[0])]
-
-                info = {k: v for (k,v) in link_info}
-
-                if link[0] == node:
-                    info['remote_name'] = link[1].info['name']
-                elif link[1] == node:
-                    info['remote_name'] = link[0].info['name']
-
-                if not node.client:
-                    if link[0].client:
-                        info['server_software'] = link[0].software
-                    elif link[1].client:
-                        info['server_software'] = link[1].software
-
-                server.info['links'].append(info)
-
+        for node, server in self.server_list():
             server_config_folder = os.path.join(self.configs_base_dir, '{}_{}'.format(server._slug_type, node.software))
 
             server.write_config(server_config_folder)
+
+    def server_list(self):
+        srv_list = []
+
+        for node in self.network.nodes():
+            server = self.node_to_server(node)
+
+            server.init_info()
+
+            srv_list.append((node, server))
+
+        return srv_list
+
+    def node_to_server(self, node):
+        # create server
+        if node.client:
+            server = servers.available[node.software]()
+        elif node.services:
+            server = services.available[node.software]()
+        elif node.service_bot:
+            server = service_bots.available[node.software]()
+
+        # set server info
+        server.info = node.info
+
+        # may be configurable later
+        server.info['network_name'] = self.network_name
+
+        server.info['links'] = []
+        for link in self.network.edges():
+            # only write link info for this node
+            if link[0] != node and link[1] != node:
+                continue
+
+            base_info = nx.get_edge_attributes(self.network, link)
+            if not base_info:
+                base_info = nx.get_edge_attributes(self.network, (link[1], link[0]))
+
+            try:
+                link_info = base_info[link]
+            except KeyError:
+                link_info = base_info[(link[1], link[0])]
+
+            info = {k: v for (k,v) in link_info}
+
+            if link[0] == node:
+                info['remote_name'] = link[1].info['name']
+            elif link[1] == node:
+                info['remote_name'] = link[0].info['name']
+
+            if not node.client:
+                if link[0].client:
+                    info['server_software'] = link[0].software
+                elif link[1].client:
+                    info['server_software'] = link[1].software
+
+            server.info['links'].append(info)
+
+        return server
 
     def generate(self, ircd_type=None, services_type=None, use_services=True, service_bots=[]):
         """Generate the given IRC server map."""
@@ -297,7 +326,9 @@ class VircManager:
         used_sids = []
 
         for server in self.network.nodes():
-            info = {}
+            info = {
+                'users': {},
+            }
 
             # generate name
             if server.services:

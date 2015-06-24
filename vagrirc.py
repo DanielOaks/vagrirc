@@ -45,3 +45,4 @@ if __name__ == '__main__':
         manager.write_server_configs()
         manager.write_source_files()
         manager.write_build_files()
+        manager.write_init_files()
