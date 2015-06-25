@@ -9,10 +9,12 @@ from ..base import BaseServices
 # Removal Regexes
 config_initial_replacements = [
     re.compile(r'(?:[\s\n]|^)/\*(.|[\r\n])*?\*/'),  # c style comments
+    (re.compile(r'(module[\s\n]+?{[\s\n]+?name = "os_session")'), r'#\1'),  # comment out os_session block
     re.compile(r'\n#[a-zA-Z0-9]+\s*\n?\s*{[^}]+}'),  # remove commented out blocks
     (re.compile(r'\n(?:\s*\n)+'), r'\n'),  # remove blank lines
     (re.compile(r'^[\s\n]*([\S\s]*?)[\s\n]*$'), r'\1\n'),  # remove start/end blank space, make sure newline at end
     ('usemail = yes', 'usemail = no'),  # we don't use mail
+    ('operserv.example.conf', 'operserv.conf'),  # we change session limit settings
 ]
 
 config_replacements = {
@@ -71,7 +73,8 @@ class Anope2Services(BaseServices):
                 else:
                     config_data = rep.sub(sub, config_data)
             else:
-                print('anope2 config: skipping key:', key)
+                # print('anope2 config: skipping key:', key)
+                ...
 
         # external ircd module to load
         server_sw = self.info['links'][0]['server_software']
@@ -98,6 +101,30 @@ class Anope2Services(BaseServices):
             os.makedirs(output_config_dir)
 
         output_config_file = os.path.join(output_config_dir, 'services.conf')
+        with open(output_config_file, 'w') as config_file:
+            config_file.write(config_data)
+
+        # load original config file
+        original_config_file = os.path.join(self.source_folder, 'data', 'operserv.example.conf')
+        with open(original_config_file, 'r') as config_file:
+            config_data = config_file.read()
+
+        # removing useless junk
+        for rep in config_initial_replacements:
+            # replacement
+            if isinstance(rep, (list, tuple)):
+                rep, sub = rep
+
+            # removal
+            else:
+                sub = ''
+
+            if isinstance(rep, str):
+                config_data = config_data.replace(rep, sub)
+            else:
+                config_data = rep.sub(sub, config_data)
+
+        output_config_file = os.path.join(output_config_dir, 'operserv.conf')
         with open(output_config_file, 'w') as config_file:
             config_file.write(config_data)
 
