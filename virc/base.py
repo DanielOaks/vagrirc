@@ -107,6 +107,10 @@ class BaseServer(ReleaseDownloader):
     _slug_type = 'ircd'
     info = {}
 
+    def init_info(self):
+        """Initialise user/channel/etc info."""
+        ...
+
     def write_config(self, folder):
         """Write config file to the given folder."""
         ...
@@ -124,6 +128,10 @@ class BaseServices(ReleaseDownloader):
     _slug_type = 'services'
     info = {}
 
+    def init_info(self):
+        """Initialise user/channel/etc info."""
+        ...
+
     def write_config(self, folder):
         """Write config file to the given folder."""
         ...
@@ -140,6 +148,10 @@ class BaseServices(ReleaseDownloader):
 class BaseServiceBot(ReleaseDownloader):
     _slug_type = 'servicebot'
     info = {}
+
+    def init_info(self):
+        """Initialise user/channel/etc info."""
+        ...
 
     def write_config(self, folder):
         """Write config file to the given folder."""

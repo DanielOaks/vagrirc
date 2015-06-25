@@ -62,22 +62,29 @@ class VircManager:
         info = self.info_from_server_list(server_list)
 
         for node, server in server_list:
-            print(node.name)
+            ...
 
     def info_from_server_list(self, server_list):
         """Return info and server list."""
         info = {
             'users': {
                 'dan': {
-                    'oper': True,
-                    'oper_pass': 'qwerty',
-                    'nickserv_pass': 'qwertyuiop',
+                    'ircd': {
+                        'oper': True,
+                        'oper_pass': 'qwerty'
+                    },
+                    'services': {
+                        'nickserv_pass': 'qwertyuiop',
+                        'level': 'root',
+                    },
                     'email': 'dan@example.com',
                 }
             }
         }
 
         for node, server in server_list:
+            server.init_info()
+
             info['users'].update(server.info['users'])
 
         return info, server_list
@@ -179,8 +186,6 @@ class VircManager:
 
         for node in self.network.nodes():
             server = self.node_to_server(node)
-
-            server.init_info()
 
             srv_list.append((node, server))
 

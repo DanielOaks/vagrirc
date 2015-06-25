@@ -18,7 +18,9 @@ class AcidServiceBot(BaseServiceBot):
         """Create our info."""
         self.info['users'] = {
             'moo': {
-                'nickserv_pass': 'moomoo',
+                'services': {
+                    'nickserv_pass': 'moomoo',
+                },
                 'email': 'moo@example.com',
             }
         }
