@@ -10,17 +10,18 @@ configuration files and shell scripts for the virtual machine to provision it
 all once it's online.
 
 Usage:
-    vagrirc.py generate [options]
+    vagrirc.py generate (--oper <name:password>)... [options]
     vagrirc.py write
     vagrirc.py (-h | --help)
     vagrirc.py --version
 
 Options:
-    --ircd <ircd>             IRCd to provision [default: hybrid].
-    --services <services>     Services package to provision [default: anope2].
-    --service-bots <bots>...  Service bots to include (separated by comma <,>).
-    -h, --help                Show this screen
-    --version                 Show VagrIRC version
+    --ircd <ircd>                IRCd to provision [default: hybrid].
+    --services <services>        Services package to provision [default: anope2].
+    --service-bots <bots>...     Service bots to include (separated by comma <,>).
+    (--oper <name:password>)...  Make an oper / opers with the given names and passwords.
+    -h, --help                   Show this screen
+    --version                    Show VagrIRC version
 """
 from docopt import docopt
 import virc
@@ -36,8 +37,9 @@ if __name__ == '__main__':
         if service_bots is None:
             service_bots = ''
         service_bots = service_bots.split(',')
+        oper_usernames_and_passwords = [name.split(':', 1) for name in arguments.get('<name:password>', [])]
 
-        manager.generate(ircd_type=ircd, services_type=services, service_bots=service_bots)
+        manager.generate(ircd_type=ircd, services_type=services, service_bots=service_bots, opers=oper_usernames_and_passwords)
 
     elif arguments['write']:
         manager = virc.VircManager()

@@ -12,10 +12,9 @@ extension = 'yaml'
 
 def dump(network):
     """Serialize the given network map to a string."""
-    info = {
-        'servers': {},
-        'links': {},
-    }
+    info = network.info
+    info['servers'] = {}
+    info['links'] = {}
 
     # servers
     for server in network.nodes():
@@ -65,6 +64,7 @@ def load(in_str):
     nw_info = yaml.load(in_str)
 
     if not nw_info:
+        network.info = {}
         return network
 
     for sid, info in nw_info.get('servers', {}).items():
@@ -98,5 +98,13 @@ def load(in_str):
         link_info = tuple(link_info)
 
         servers[link[0]].link_to(servers[link[1]], info=link_info)
+
+    # set network info
+    if 'servers' in nw_info:
+        del nw_info['servers']
+    if 'links' in nw_info:
+        del nw_info['links']
+
+    network.info = nw_info
 
     return network

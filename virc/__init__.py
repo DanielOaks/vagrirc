@@ -178,21 +178,7 @@ class VircManager:
 
     def info_from_server_list(self, server_list):
         """Return info and server list."""
-        info = {
-            'users': {
-                'dan': {
-                    'ircd': {
-                        'oper': True,
-                        'oper_pass': 'qwerty'
-                    },
-                    'services': {
-                        'nickserv_pass': 'qwertyuiop',
-                        'level': 'root',
-                    },
-                    'email': 'dan@example.com',
-                },
-            },
-        }
+        info = dict(self.network.info)
 
         for node, server in server_list:
             server.init_info()
@@ -259,10 +245,28 @@ class VircManager:
 
         return server
 
-    def generate(self, ircd_type=None, services_type=None, use_services=True, service_bots=[]):
+    def generate(self, ircd_type=None, services_type=None, use_services=True, service_bots=[], opers=[]):
         """Generate the given IRC server map."""
         self.network = map.IrcNetwork()
+        self.network.info = {
+            'users': {}
+        }
 
+        # set network info, opers etc
+        for name, password in opers:
+            self.network.info['users'][name] = {
+                'ircd': {
+                    'oper': True,
+                    'oper_pass': password,
+                },
+                'services': {
+                    'nickserv_pass': password,
+                    'level': 'root',
+                },
+                'email': 'oper@example.com',
+            }
+
+        # ensure ircd and services exist
         ircd_type = servers.available[ircd_type]().name
         services_type = services.available[services_type]().name
 
