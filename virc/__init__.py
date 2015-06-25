@@ -58,21 +58,29 @@ class VircManager:
             shutil.rmtree(self.init_base_dir)
 
         # info
-        users = {
-            'dan': {
-                'oper': True,
-                'ircd_pass': 'qwerty',
-                'nickserv_pass': 'qwertyuiop',
-                'email': 'dan@example.com',
+        server_list = self.server_list()
+        info = self.info_from_server_list(server_list)
+
+        for node, server in server_list:
+            print(node.name)
+
+    def info_from_server_list(self, server_list):
+        """Return info and server list."""
+        info = {
+            'users': {
+                'dan': {
+                    'oper': True,
+                    'oper_pass': 'qwerty',
+                    'nickserv_pass': 'qwertyuiop',
+                    'email': 'dan@example.com',
+                }
             }
         }
 
-        server_list = self.server_list()
-
         for node, server in server_list:
-            users.update(server.info['users'])
+            info['users'].update(server.info['users'])
 
-        # for node, server in server_list:
+        return info, server_list
 
     def write_build_files(self):
         """Write necessary build files for our software."""
