@@ -25,7 +25,7 @@ class AcidServiceBot(BaseServiceBot):
             }
         }
 
-    def write_config(self, folder):
+    def write_config(self, folder, info):
         """Write config file to the given folder."""
         config_files = {
             'pyva-native': [

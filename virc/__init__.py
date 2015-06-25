@@ -19,6 +19,10 @@ from .utils import nodelist
 version = '0.0.1'
 name_version = 'VagrIRC {}'.format(version)
 
+INIT_FILE_TEMPLATE = '''#!/usr/bin/env python3
+{lines}
+'''
+
 
 class VircManager:
     """Can create and map out an IRC network."""
@@ -61,8 +65,24 @@ class VircManager:
         server_list = self.server_list()
         info = self.info_from_server_list(server_list)
 
+        init_file = INIT_FILE_TEMPLATE
+        commands = []
+
         for node, server in server_list:
-            ...
+            server_init_folder = os.path.join(self.init_base_dir, server.slug)
+            guest_init_folder = os.path.join('/irc/init', server.slug)
+
+            # files = server.write_init_files(server_init_folder, guest_init_folder)
+
+            # services commands should always get executed first
+            if node.services:
+                cmd_tmp = list(commands)
+                # commands = server.init_commands()
+                commands.extend(cmd_tmp)
+                del cmd_tmp
+            else:
+                # commands.extend(server.init_commands())
+                ...
 
     def write_build_files(self):
         """Write necessary build files for our software."""
@@ -148,10 +168,13 @@ class VircManager:
             shutil.rmtree(self.configs_base_dir)
 
         # write new config files
-        for node, server in self.server_list():
+        server_list = self.server_list()
+        info = self.info_from_server_list(server_list)
+
+        for node, server in server_list:
             server_config_folder = os.path.join(self.configs_base_dir, server.slug)
 
-            server.write_config(server_config_folder)
+            server.write_config(server_config_folder, info)
 
     def info_from_server_list(self, server_list):
         """Return info and server list."""
@@ -167,8 +190,8 @@ class VircManager:
                         'level': 'root',
                     },
                     'email': 'dan@example.com',
-                }
-            }
+                },
+            },
         }
 
         for node, server in server_list:
@@ -176,7 +199,7 @@ class VircManager:
 
             info['users'].update(server.info['users'])
 
-        return info, server_list
+        return info
 
     def server_list(self):
         srv_list = []

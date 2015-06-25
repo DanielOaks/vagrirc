@@ -111,7 +111,7 @@ class BaseServer(ReleaseDownloader):
         """Initialise user/channel/etc info."""
         ...
 
-    def write_config(self, folder):
+    def write_config(self, folder, info):
         """Write config file to the given folder."""
         ...
 
@@ -132,7 +132,7 @@ class BaseServices(ReleaseDownloader):
         """Initialise user/channel/etc info."""
         ...
 
-    def write_config(self, folder):
+    def write_config(self, folder, info):
         """Write config file to the given folder."""
         ...
 
@@ -153,7 +153,7 @@ class BaseServiceBot(ReleaseDownloader):
         """Initialise user/channel/etc info."""
         ...
 
-    def write_config(self, folder):
+    def write_config(self, folder, info):
         """Write config file to the given folder."""
         ...
 

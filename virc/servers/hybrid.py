@@ -56,6 +56,26 @@ LISTEN_BLOCK = r"""\1\nlisten {{
 }};
 {connect_blocks}"""
 
+OPERATOR_BLOCK = '''operator {{
+    name = "{name}";
+
+    user = "*@127.0.0.1";
+    user = "*@localhost";
+
+    password = "{password}";
+    encrypted = no;
+
+    whois = "is an IRC Operator";
+    ssl_connection_required = no;
+
+    class = "opers";
+    umodes = locops, servnotice, wallop, external, cconn, debug, farconnect,
+        skill, unauth;
+    flags = admin, connect, connect:remote, die, globops, kill, kill:remote,
+        kline, module, rehash, restart, set, unkline, unxline, xline;
+}};
+'''
+
 
 class HybridServer(BaseServer):
     """Implements support for the Hybrid IRCd."""
@@ -63,7 +83,7 @@ class HybridServer(BaseServer):
     release = '8.2.8'
     url = 'https://github.com/ircd-hybrid/ircd-hybrid/archive/{release}.zip'
 
-    def write_config(self, folder):
+    def write_config(self, folder, info):
         """Write config file to the given folder."""
         # load original config file
         original_config_file = os.path.join(self.source_folder, 'doc', 'reference.conf')
@@ -117,6 +137,17 @@ class HybridServer(BaseServer):
                                   connect_blocks='\n'.join(connect_blocks))
 
         config_data = lregex.sub(sub, config_data)
+
+        # users
+        for name, info in info['users'].items():
+            if 'ircd' not in info:
+                continue
+
+            if 'oper' in info['ircd'] and info['ircd']['oper']:
+                oper_name = info['ircd']['oper_name'] if 'oper_name' in info['ircd'] else name
+                oper_pass = info['ircd']['oper_pass']
+
+                config_data += OPERATOR_BLOCK.format(name=oper_name, password=oper_pass)
 
         # writing out config file
         output_config_dir = os.path.join(folder, 'etc')

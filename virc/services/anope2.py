@@ -40,7 +40,7 @@ class Anope2Services(BaseServices):
     release = '2.0.1'
     url = 'https://github.com/anope/anope/archive/{release}.zip'
 
-    def write_config(self, folder):
+    def write_config(self, folder, info):
         """Write config file to the given folder."""
         # load original config file
         original_config_file = os.path.join(self.source_folder, 'data', 'example.conf')
