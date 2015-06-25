@@ -30,8 +30,7 @@ UPLINK_BLOCK = r"""uplink
     ssl = no
     port = {port}
     password = "{password}"
-}}
-"""
+}}"""
 
 
 class Anope2Services(BaseServices):
