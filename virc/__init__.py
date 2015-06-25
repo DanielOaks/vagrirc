@@ -64,31 +64,6 @@ class VircManager:
         for node, server in server_list:
             ...
 
-    def info_from_server_list(self, server_list):
-        """Return info and server list."""
-        info = {
-            'users': {
-                'dan': {
-                    'ircd': {
-                        'oper': True,
-                        'oper_pass': 'qwerty'
-                    },
-                    'services': {
-                        'nickserv_pass': 'qwertyuiop',
-                        'level': 'root',
-                    },
-                    'email': 'dan@example.com',
-                }
-            }
-        }
-
-        for node, server in server_list:
-            server.init_info()
-
-            info['users'].update(server.info['users'])
-
-        return info, server_list
-
     def write_build_files(self):
         """Write necessary build files for our software."""
         # remove old config files
@@ -102,14 +77,12 @@ class VircManager:
         launch_files = []
 
         for node, server in self.server_list():
-            server_slug = '{}_{}'.format(server._slug_type, node.software)
-
-            server_build_folder = os.path.join(self.build_base_dir, server_slug)
-            server_launch_folder = os.path.join(self.launch_base_dir, server_slug)
-            server_bin_folder = os.path.join('/irc/bin', server_slug)
-            server_src_folder = os.path.join('/irc/src', server_slug)
-            guest_build_folder = os.path.join('/irc/build', server_slug)
-            guest_config_folder = os.path.join('/irc/configs', server_slug)
+            server_build_folder = os.path.join(self.build_base_dir, server.slug)
+            server_launch_folder = os.path.join(self.launch_base_dir, server.slug)
+            server_bin_folder = os.path.join('/irc/bin', server.slug)
+            server_src_folder = os.path.join('/irc/src', server.slug)
+            guest_build_folder = os.path.join('/irc/build', server.slug)
+            guest_config_folder = os.path.join('/irc/configs', server.slug)
 
             # build folder
             os.makedirs(server_build_folder)
@@ -121,7 +94,7 @@ class VircManager:
                                           guest_config_folder,)
 
             if bf:
-                build_file = os.path.join('/irc/build', server_slug, 'build.sh')
+                build_file = os.path.join('/irc/build', server.slug, 'build.sh')
                 build_files.append(build_file)
 
             # launch folder
@@ -134,7 +107,7 @@ class VircManager:
                                           guest_config_folder,)
 
             if lf:
-                launch_file = os.path.join('/irc/launch', server_slug, 'launch.sh')
+                launch_file = os.path.join('/irc/launch', server.slug, 'launch.sh')
                 # XXX - to create a proper dependency manager solution here
                 # or just be lazy and do a launch priority
                 if node.client:
@@ -164,8 +137,7 @@ class VircManager:
 
         # write software folders
         for node, server in self.server_list():
-            server_slug = '{}_{}'.format(server._slug_type, node.software)
-            src_folder = os.path.join(self.src_base_dir, server_slug)
+            src_folder = os.path.join(self.src_base_dir, server.slug)
 
             shutil.copytree(server.source_folder, src_folder)
 
@@ -177,15 +149,41 @@ class VircManager:
 
         # write new config files
         for node, server in self.server_list():
-            server_config_folder = os.path.join(self.configs_base_dir, '{}_{}'.format(server._slug_type, node.software))
+            server_config_folder = os.path.join(self.configs_base_dir, server.slug)
 
             server.write_config(server_config_folder)
+
+    def info_from_server_list(self, server_list):
+        """Return info and server list."""
+        info = {
+            'users': {
+                'dan': {
+                    'ircd': {
+                        'oper': True,
+                        'oper_pass': 'qwerty'
+                    },
+                    'services': {
+                        'nickserv_pass': 'qwertyuiop',
+                        'level': 'root',
+                    },
+                    'email': 'dan@example.com',
+                }
+            }
+        }
+
+        for node, server in server_list:
+            server.init_info()
+
+            info['users'].update(server.info['users'])
+
+        return info, server_list
 
     def server_list(self):
         srv_list = []
 
         for node in self.network.nodes():
             server = self.node_to_server(node)
+            server.slug = '{}_{}'.format(server._slug_type, node.software)
 
             srv_list.append((node, server))
 
