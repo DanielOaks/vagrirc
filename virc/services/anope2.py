@@ -32,6 +32,13 @@ UPLINK_BLOCK = r"""uplink
     password = "{password}"
 }}"""
 
+OPERATOR_BLOCK = r"""oper
+{{
+    name = "{name}"
+    type = "{level}"
+    vhost = "oper.dnt"
+}}"""
+
 
 class Anope2Services(BaseServices):
     """Implements support for Anope2 Services."""
@@ -92,6 +99,24 @@ class Anope2Services(BaseServices):
         uplink = UPLINK_BLOCK.format(port=self.info['links'][0]['port'],
                                      password=self.info['links'][0]['password'])
         config_data = uplink_regex.sub(uplink, config_data)
+
+        # opers
+        for name, info in info['users'].items():
+            if 'services' not in info:
+                continue
+
+            level = info['services'].get('level', None)
+
+            # convert from general names to specific names
+            if level == 'root':
+                level = 'Services Root'
+
+            # only add operator block if they have a valid level
+            if level:
+                services_name = info['services']['name'] if 'name' in info['services'] else name
+                password = info['services']['password']
+
+                config_data += OPERATOR_BLOCK.format(level=level, name=services_name, password=password)
 
         # writing out config file
         output_config_dir = os.path.join(folder, 'conf')

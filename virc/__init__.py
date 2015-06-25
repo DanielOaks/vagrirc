@@ -260,7 +260,7 @@ class VircManager:
                     'oper_pass': password,
                 },
                 'services': {
-                    'nickserv_pass': password,
+                    'password': password,
                     'level': 'root',
                 },
                 'email': 'oper@example.com',
