@@ -110,6 +110,8 @@ class Anope2Services(BaseServices):
             # convert from general names to specific names
             if level == 'root':
                 level = 'Services Root'
+            elif level == 'service bot':
+                level = 'Services Root'  # xxx - lazy, but works for now
 
             # only add operator block if they have a valid level
             if level:

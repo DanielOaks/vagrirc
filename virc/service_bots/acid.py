@@ -20,6 +20,7 @@ class AcidServiceBot(BaseServiceBot):
             'moo': {
                 'services': {
                     'password': 'moomoo',
+                    'level': 'service bot',
                 },
                 'email': 'moo@example.com',
             }
@@ -30,7 +31,7 @@ class AcidServiceBot(BaseServiceBot):
         config_files = {
             'pyva-native': [
                 os.path.join(self.source_folder, 'pyva', 'pyva-native', 'pyva-cpp', 'make.example.properties'),
-                os.path.join(folder, 'pyva', 'pyva-native', 'pyva-cpp', 'config.mk'),
+                os.path.join(folder, 'pyva', 'pyva-native', 'pyva-cpp', 'make.properties'),
             ],
             'acid': [
                 os.path.join(self.source_folder, 'acid', 'acidictive.example.yml'),
@@ -72,3 +73,26 @@ class AcidServiceBot(BaseServiceBot):
         # and writing it out
         with open(new, 'w') as config_file:
             config_file.write(yaml.dump(conf))
+
+    def write_build_files(self, folder, src_folder, bin_folder, build_folder, config_folder):
+        """Write build files to the given folder."""
+        build_file = """#!/usr/bin/env sh
+cp -R {src_folder} {bin_folder}
+cd {bin_folder}
+
+cp {config_folder}/pyva/pyva-native/pyva-cpp/make.properties {bin_folder}/pyva/pyva-native/pyva-cpp/
+
+mvn install
+
+ln -s pyva/pyva-native/pyva-cpp/libpyva.so libpyva.so
+pip install -r requirements.txt
+
+cp {config_folder}/acid/acidictive.yml {bin_folder}/acid/acidictive.yml
+""".format(src_folder=src_folder, bin_folder=bin_folder, config_folder=config_folder)
+
+        build_filename = os.path.join(folder, 'build.sh')
+
+        with open(build_filename, 'w') as b_file:
+            b_file.write(build_file)
+
+        return True
