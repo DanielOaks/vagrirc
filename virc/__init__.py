@@ -151,7 +151,7 @@ class VircManager:
 
     def write_source_files(self):
         """Write software files."""
-        # remove old config files
+        # remove old source files
         if os.path.exists(self.src_base_dir):
             shutil.rmtree(self.src_base_dir)
 
