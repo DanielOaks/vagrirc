@@ -103,64 +103,41 @@ class ReleaseDownloader:
             os.remove(tmp_filename)
 
 
-class BaseServer(ReleaseDownloader):
+class BaseSoftware(ReleaseDownloader):
+    info = {}
+
+    def init_info(self):
+        """Initialise user/channel/etc info."""
+        ...
+
+    def init_users(self, info):
+        """Return a list of 'users' to join to the network, along with commands.
+
+        Used during network provisioning to register accounts with NickServ,
+        register and set channel info such as topic, etc.
+        """
+        ...
+
+    def write_config(self, folder, info):
+        """Write config file to the given folder."""
+        ...
+
+    def write_build_files(self, folder, src_folder, bin_folder, build_folder, config_folder):
+        """Write build files to the given folder."""
+        ...
+
+    def write_launch_files(self, folder, src_folder, bin_folder, build_folder, config_folder):
+        """Write launch files to the given folder."""
+        ...
+
+
+class BaseServer(BaseSoftware):
     _slug_type = 'ircd'
-    info = {}
-
-    def init_info(self):
-        """Initialise user/channel/etc info."""
-        ...
-
-    def write_config(self, folder, info):
-        """Write config file to the given folder."""
-        ...
-
-    def write_build_files(self, folder, src_folder, bin_folder, build_folder, config_folder):
-        """Write build files to the given folder."""
-        ...
-
-    def write_launch_files(self, folder, src_folder, bin_folder, build_folder, config_folder):
-        """Write launch files to the given folder."""
-        ...
 
 
-class BaseServices(ReleaseDownloader):
+class BaseServices(BaseSoftware):
     _slug_type = 'services'
-    info = {}
-
-    def init_info(self):
-        """Initialise user/channel/etc info."""
-        ...
-
-    def write_config(self, folder, info):
-        """Write config file to the given folder."""
-        ...
-
-    def write_build_files(self, folder, src_folder, bin_folder, build_folder, config_folder):
-        """Write build files to the given folder."""
-        ...
-
-    def write_launch_files(self, folder, src_folder, bin_folder, build_folder, config_folder):
-        """Write launch files to the given folder."""
-        ...
 
 
-class BaseServiceBot(ReleaseDownloader):
+class BaseServiceBot(BaseSoftware):
     _slug_type = 'servicebot'
-    info = {}
-
-    def init_info(self):
-        """Initialise user/channel/etc info."""
-        ...
-
-    def write_config(self, folder, info):
-        """Write config file to the given folder."""
-        ...
-
-    def write_build_files(self, folder, src_folder, bin_folder, build_folder, config_folder):
-        """Write build files to the given folder."""
-        ...
-
-    def write_launch_files(self, folder, src_folder, bin_folder, build_folder, config_folder):
-        """Write launch files to the given folder."""
-        ...
