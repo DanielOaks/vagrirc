@@ -124,7 +124,7 @@ class VircManager:
                                           guest_config_folder,)
 
             if bf:
-                build_file = os.path.join('/irc/build', server.slug, 'build.sh')
+                build_file = os.path.join('/irc/build', server.slug, 'build')
                 build_files.append(build_file)
 
             # launch folder
@@ -137,7 +137,7 @@ class VircManager:
                                           guest_config_folder,)
 
             if lf:
-                launch_file = os.path.join('/irc/launch', server.slug, 'launch.sh')
+                launch_file = os.path.join('/irc/launch', server.slug, 'launch')
                 # XXX - to create a proper dependency manager solution here
                 # or just be lazy and do a launch priority
                 if node.client:
@@ -146,14 +146,14 @@ class VircManager:
                     launch_files.append(launch_file)
 
         # write build files
-        with open(os.path.join(self.build_base_dir, 'build.sh'), 'w') as build_file:
+        with open(os.path.join(self.build_base_dir, 'build'), 'w') as build_file:
             build_file.write('#!/usr/bin/env sh\n')
             for filename in build_files:
                 build_file.write('chmod +x ' + filename + '\n')
                 build_file.write(filename + '\n')
 
         # write launch files
-        with open(os.path.join(self.launch_base_dir, 'launch.sh'), 'w') as launch_file:
+        with open(os.path.join(self.launch_base_dir, 'launch'), 'w') as launch_file:
             launch_file.write('#!/usr/bin/env sh\n')
             for filename in launch_files:
                 launch_file.write('chmod +x ' + filename + '\n')

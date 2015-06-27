@@ -101,7 +101,7 @@ pip install -r requirements.txt
 cp {config_folder}/acid/acidictive.yml {bin_folder}/acid/acidictive.yml
 """.format(src_folder=src_folder, bin_folder=bin_folder, config_folder=config_folder)
 
-        build_filename = os.path.join(folder, 'build.sh')
+        build_filename = os.path.join(folder, 'build')
 
         with open(build_filename, 'w') as b_file:
             b_file.write(build_file)

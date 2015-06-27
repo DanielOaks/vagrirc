@@ -182,7 +182,7 @@ make install
 cp {config_folder}/etc/reference.conf {bin_folder}/etc/ircd.conf
 """.format(src_folder=src_folder, bin_folder=bin_folder, config_folder=config_folder)
 
-        build_filename = os.path.join(folder, 'build.sh')
+        build_filename = os.path.join(folder, 'build')
 
         with open(build_filename, 'w') as b_file:
             b_file.write(build_file)
@@ -195,7 +195,7 @@ cp {config_folder}/etc/reference.conf {bin_folder}/etc/ircd.conf
 {bin_folder}/bin/ircd
 """.format(src_folder=src_folder, bin_folder=bin_folder, config_folder=config_folder)
 
-        launch_filename = os.path.join(folder, 'launch.sh')
+        launch_filename = os.path.join(folder, 'launch')
 
         with open(launch_filename, 'w') as l_file:
             l_file.write(launch_file)

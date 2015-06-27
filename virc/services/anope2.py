@@ -222,7 +222,7 @@ make install
 cp /irc/configs/services_anope2/conf/services.conf /irc/bin/services_anope2/conf/services.conf
 """.format(src_folder=src_folder, bin_folder=bin_folder, config_folder=config_folder)
 
-        build_filename = os.path.join(folder, 'build.sh')
+        build_filename = os.path.join(folder, 'build')
 
         with open(build_filename, 'w') as b_file:
             b_file.write(build_file)
@@ -235,7 +235,7 @@ cp /irc/configs/services_anope2/conf/services.conf /irc/bin/services_anope2/conf
 {bin_folder}/bin/services
 """.format(src_folder=src_folder, bin_folder=bin_folder, config_folder=config_folder)
 
-        launch_filename = os.path.join(folder, 'launch.sh')
+        launch_filename = os.path.join(folder, 'launch')
 
         with open(launch_filename, 'w') as l_file:
             l_file.write(launch_file)
