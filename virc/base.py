@@ -53,6 +53,7 @@ class ReleaseDownloader:
         if self.vcs == 'git':
             import git
 
+            return True  # XXX - temp, testing, should not be here
             if os.path.exists(self.source_folder):
                 repo = git.Repo(self.source_folder)
                 repo.remotes.origin.fetch()
@@ -116,7 +117,7 @@ class BaseSoftware(ReleaseDownloader):
         Used during network provisioning to register accounts with NickServ,
         register and set channel info such as topic, etc.
         """
-        ...
+        return []
 
     def write_config(self, folder, info):
         """Write config file to the given folder."""

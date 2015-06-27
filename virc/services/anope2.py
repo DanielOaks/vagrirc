@@ -46,6 +46,47 @@ class Anope2Services(BaseServices):
     release = '2.0.1'
     url = 'https://github.com/anope/anope/archive/{release}.zip'
 
+    def init_users(self, info):
+        """Return a list of 'users' to join to the network, along with commands.
+
+        Used during network provisioning to register accounts with NickServ,
+        register and set channel info such as topic, etc.
+        """
+        users = []
+
+        for name, uinfo in info['users'].items():
+            # only worry about users with nickserv / etc to setup
+            if 'services' not in uinfo:
+                continue
+
+            sinfo = uinfo['services']
+
+            # define base user info
+            nick = sinfo.get('account_name', name)
+            user = uinfo.get('user', 'initbot')
+            commands = []
+
+            # if they need to be registered with nickserv
+            if 'password' in sinfo:
+                # fake email if they don't have one
+                register_args = {
+                    'password': sinfo['password'],
+                    'email': uinfo.get('email', '{}@example.com'.format(name)),
+                }
+
+                commands.append(['nickserv', 'register {password} {email}'.format(**register_args)])
+
+            # assemble new user
+            new_user = {
+                'nick': nick,
+                'user': user,
+                'commands': commands,
+            }
+
+            users.append(new_user)
+
+        return users
+
     def write_config(self, folder, info):
         """Write config file to the given folder."""
         # load original config file

@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 # VagrIRC Virc library
 import os
+import json
 import random
 import string
 import shutil
@@ -60,29 +61,27 @@ class VircManager:
         # remove old config files
         if os.path.exists(self.init_base_dir):
             shutil.rmtree(self.init_base_dir)
+        os.makedirs(self.init_base_dir)
 
         # info
         server_list = self.server_list()
         info = self.info_from_server_list(server_list)
 
-        init_file = INIT_FILE_TEMPLATE
-        commands = []
+        # users
+        host_init_users_file = os.path.join(self.init_base_dir, 'users.json')
+        users = []
 
         for node, server in server_list:
-            server_init_folder = os.path.join(self.init_base_dir, server.slug)
-            guest_init_folder = os.path.join('/irc/init', server.slug)
+            new_users = server.init_users(info)
 
-            # files = server.write_init_files(server_init_folder, guest_init_folder)
-
-            # services commands should always get executed first
             if node.services:
-                cmd_tmp = list(commands)
-                # commands = server.init_commands()
-                commands.extend(cmd_tmp)
-                del cmd_tmp
+                new_users.extend(users)
+                users = new_users
             else:
-                # commands.extend(server.init_commands())
-                ...
+                users.extend(new_users)
+
+        with open(host_init_users_file, 'w') as users_file:
+            users_file.write(json.dumps(users))
 
     def write_build_files(self):
         """Write necessary build files for our software."""
