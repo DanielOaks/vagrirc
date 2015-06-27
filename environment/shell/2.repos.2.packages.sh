@@ -1,6 +1,6 @@
 #/usr/bin/env sh
 # Repos Setup
-# Mostly taken from the wonderful PuPHPet project
+# Mostly taken from the wonderful PuPHPet project, used under the MIT license
 
 # CentOS release we're using
 OS=centos
