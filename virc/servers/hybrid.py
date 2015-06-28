@@ -43,6 +43,7 @@ config_initial_replacements = [
     re.compile(r'\n\s*havent_read_conf.+'),
     re.compile(r'\n\s*flags = need_ident;'),
     ('hub = no;', 'hub = yes;'),
+    ('throttle_time = 2 seconds;', 'throttle_time = 0;'),  # else we get locked out during config
 ]
 
 config_replacements = {
