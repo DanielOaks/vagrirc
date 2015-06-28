@@ -74,7 +74,7 @@ class Anope2Services(BaseServices):
 
             # define base user info
             nick = sinfo.get('account_name', name)
-            user = uinfo.get('user', 'initbot')
+            user = uinfo.get('username', 'initbot')
             commands = []
 
             # if they need to be registered with nickserv
@@ -90,7 +90,7 @@ class Anope2Services(BaseServices):
             # assemble new user
             new_user = {
                 'nick': nick,
-                'user': user,
+                'username': user,
                 'commands': commands,
             }
 

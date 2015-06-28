@@ -72,7 +72,8 @@ class VircManager:
         # remove old config files
         if os.path.exists(self.init_base_dir):
             shutil.rmtree(self.init_base_dir)
-        os.makedirs(self.init_base_dir)
+        init_base = os.path.join('environment', 'init_base')  # XXX - dodgy
+        shutil.copytree(init_base, self.init_base_dir)
 
         # info
         server_list = self.server_list()
