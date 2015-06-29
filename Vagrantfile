@@ -68,7 +68,7 @@ Vagrant.configure(2) do |config|
   config.vm.provision "shell", inline: "chmod +x /irc/launch/launch && /irc/launch/launch", privileged: false, run: "always"
 
   # create clients and channels with NickServ and such
-  # config.vm.provision "shell", inline: "chmod +x /irc/init/init && /irc/init/init", privileged: false
+  config.vm.provision "shell", inline: "chmod +x /irc/init/init && /irc/init/init", privileged: false
 
   # tell them where to go
   config.vm.post_up_message = "Your IRC server should now be accessible from irc://localhost:9997/"
