@@ -105,7 +105,8 @@ class VircManager:
 
         # build file links
         build_files = []
-        launch_files = []
+        launch_core_files = []
+        launch_rest_files = []
 
         for node, server in self.server_list():
             server_build_folder = os.path.join(self.build_base_dir, server.slug)
@@ -141,10 +142,14 @@ class VircManager:
                 launch_file = os.path.join('/irc/launch', server.slug, 'launch')
                 # XXX - to create a proper dependency manager solution here
                 # or just be lazy and do a launch priority
+
+                # init launch files
                 if node.client:
-                    launch_files = [launch_file] + launch_files
+                    launch_core_files = [launch_file] + launch_core_files
+                elif node.services:
+                    launch_core_files.append(launch_file)
                 else:
-                    launch_files.append(launch_file)
+                    launch_rest_files.append(launch_file)
 
         # write build files
         with open(os.path.join(self.build_base_dir, 'build'), 'w') as build_file:
@@ -154,9 +159,15 @@ class VircManager:
                 build_file.write(filename + '\n')
 
         # write launch files
-        with open(os.path.join(self.launch_base_dir, 'launch'), 'w') as launch_file:
+        with open(os.path.join(self.launch_base_dir, 'launch_core'), 'w') as launch_file:
             launch_file.write('#!/usr/bin/env sh\n')
-            for filename in launch_files:
+            for filename in launch_core_files:
+                launch_file.write('chmod +x ' + filename + '\n')
+                launch_file.write(filename + '\n')
+
+        with open(os.path.join(self.launch_base_dir, 'launch_rest'), 'w') as launch_file:
+            launch_file.write('#!/usr/bin/env sh\n')
+            for filename in launch_rest_files:
                 launch_file.write('chmod +x ' + filename + '\n')
                 launch_file.write(filename + '\n')
 
