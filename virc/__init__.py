@@ -93,7 +93,7 @@ class VircManager:
                 users.extend(new_users)
 
         with open(host_init_users_file, 'w') as users_file:
-            users_file.write(json.dumps(users))
+            users_file.write(json.dumps(users, sort_keys=True, indent=4, separators=(',', ': ')))
 
     def write_build_files(self):
         """Write necessary build files for our software."""
