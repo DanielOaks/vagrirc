@@ -46,7 +46,11 @@ class AcidServiceBot(BaseServiceBot):
             ],
             'acid': [
                 os.path.join(self.source_folder, 'acid', 'acidictive.example.yml'),
-                os.path.join(folder, 'acid', 'acidictive.yml'),
+                os.path.join(folder, 'acidictive.yml'),
+            ],
+            'pyva': [
+                os.path.join(self.source_folder, 'pyva', 'pyva.example.yml'),
+                os.path.join(folder, 'pyva.yml'),
             ],
         }
 
@@ -80,6 +84,7 @@ class AcidServiceBot(BaseServiceBot):
         conf['database'][0]['pass'] = 'acidpass'
 
         conf['debug'] = True
+        conf['serverinfo']['name'] = 'acid.dnt'
 
         # and writing it out
         with open(new, 'w') as config_file:
