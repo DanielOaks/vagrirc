@@ -220,6 +220,7 @@ make
 make install
 
 cp /irc/configs/services_anope2/conf/services.conf /irc/bin/services_anope2/conf/services.conf
+cp /irc/configs/services_anope2/conf/operserv.conf /irc/bin/services_anope2/conf/operserv.conf
 """.format(src_folder=src_folder, bin_folder=bin_folder, config_folder=config_folder)
 
         build_filename = os.path.join(folder, 'build')
