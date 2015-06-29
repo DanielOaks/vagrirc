@@ -28,15 +28,28 @@ class AcidServiceBot(BaseServiceBot):
 
     def init_info(self):
         """Create our info."""
-        self.info['users'] = {
-            'moo': {
+        self.info['users'] = {}
+
+        # load users from config file
+        config_filename = os.path.join(self.source_folder, 'pyva', 'pyva.example.yml')
+        with open(config_filename, 'r') as config_file:
+            config_data = config_file.read()
+
+        conf = yaml.load(config_data)
+
+        # loop through users
+        for info in conf['clients']:
+            nick = info['nick']
+            user = info['user']
+            password = info['nspass']
+
+            self.info['users'][nick] = {
                 'services': {
-                    'password': 'moomoo',
+                    'password': password,
                     'level': 'service bot',
                 },
-                'email': 'moo@example.com',
+                'username': user,
             }
-        }
 
     def write_config(self, folder, info):
         """Write config file to the given folder."""
@@ -137,5 +150,21 @@ cp {config_folder}/config.ini {bin_folder}/config.ini
 
         with open(build_filename, 'w') as b_file:
             b_file.write(build_file)
+
+        return True
+
+    def write_launch_files(self, folder, src_folder, bin_folder, build_folder, config_folder):
+        """Write launch files to the given folder."""
+        launch_file = """#!/usr/bin/env sh
+
+cd {bin_folder}
+JAR=acid/target/acid-acid-4.0-SNAPSHOT-jar-with-dependencies.jar
+LD_PRELOAD="/usr/lib64/libpython2.7.so" java -XX:+HeapDumpOnOutOfMemoryError -Xms64m -Xmx256m -jar $JAR
+""".format(src_folder=src_folder, bin_folder=bin_folder, config_folder=config_folder)
+
+        launch_filename = os.path.join(folder, 'launch')
+
+        with open(launch_filename, 'w') as l_file:
+            l_file.write(launch_file)
 
         return True
