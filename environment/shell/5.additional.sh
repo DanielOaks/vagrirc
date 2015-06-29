@@ -5,25 +5,13 @@ CACHE_FOLDER=/environment/cache/packages
 
 # Start of Additional Packages Setup
 echo 'Installing additional packages'
+yum -y --enablerepo=scl install python27 python27-runtime python27-devel python27-pip >/dev/null
+
 yum -y install python34u python34u-runtime python34u-libs python34u-devel python34u-pip >/dev/null
 
 yum -y install mysql-devel >/dev/null
 echo 'Finished installing additional packages'
 # End of Additional Packages Setup
-
-# Start of Python 2.7 Setup
-echo 'Installing Python 2.7'
-yum -y --enablerepo=scl install python27 python27-runtime python27-pip >/dev/null
-
-if [[ -f '/root/.bashrc' ]] && ! grep -q 'export LD_PRELOAD="$LD_PRELOAD /usr/lib64/libpython2.7.so"' /root/.bashrc; then
-    echo 'export LD_PRELOAD="$LD_PRELOAD /usr/lib64/libpython2.7.so"' >> /root/.bashrc
-fi
-if [[ -f '/etc/profile' ]] && ! grep -q 'export LD_PRELOAD="$LD_PRELOAD /usr/lib64/libpython2.7.so"' /etc/profile; then
-    echo 'export LD_PRELOAD="$LD_PRELOAD /usr/lib64/libpython2.7.so"' >> /etc/profile
-fi
-
-echo 'Finished installing Python 2.7'
-# End of Python 2.7 Setup
 
 # Start of GCC 4.8 Setup
 echo 'Installing GCC 4.8'
@@ -37,7 +25,8 @@ fi
 
 cp "${DEVTOOLS2_CACHE}" /etc/yum.repos.d
 
-yum --enablerepo=testing-devtools-2-centos-6 install devtoolset-2-gcc devtoolset-2-gcc-c++
+yum -y install devtoolset-2-gcc devtoolset-2-gcc-c++
+yum -y install devtoolset-2-binutils devtoolset-2-binutils-devel
 
 if [[ -f '/root/.bashrc' ]] && ! grep -q 'export PATH="/opt/rh/devtoolset-2/root/usr/bin/:$PATH"' /root/.bashrc; then
     echo 'export PATH="/opt/rh/devtoolset-2/root/usr/bin/:$PATH"' >> /root/.bashrc
@@ -70,7 +59,7 @@ MAVEN_DIR_NAME="$(echo ${MAVEN} | awk -F/ '{print $NF}' | awk -F- 'sub(FS $NF,x)
 
 mkdir -p "$CACHE_FOLDER"
 if [ ! -e "${MAVEN_CACHE}" ]; then
-    wget "${MAVEN}" -O "${MAVEN_CACHE}"
+    wget "${MAVEN}" -O "${MAVEN_CACHE}" >/dev/null
 fi
 
 mkdir -p "/tmp/maven"
