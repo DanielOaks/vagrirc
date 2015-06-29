@@ -5,13 +5,25 @@ CACHE_FOLDER=/environment/cache/repos
 
 # Start of Additional Packages Setup
 echo 'Installing additional packages'
-yum -y --enablerepo=scl install python27 python27-runtime python27-python-pip >/dev/null
-
 yum -y install python34u python34u-runtime python34u-libs python34u-devel python34u-pip >/dev/null
 
 yum -y install mysql-devel >/dev/null
 echo 'Finished installing additional packages'
 # End of Additional Packages Setup
+
+# Start of Python 2.7 Setup
+echo 'Installing Python 2.7'
+yum -y --enablerepo=scl install python27 python27-runtime python27-pip >/dev/null
+
+if [[ -f '/root/.bashrc' ]] && ! grep -q 'export LD_PRELOAD="$LD_PRELOAD /usr/lib64/libpython2.7.so"' /root/.bashrc; then
+    echo 'export LD_PRELOAD="$LD_PRELOAD /usr/lib64/libpython2.7.so"' >> /root/.bashrc
+fi
+if [[ -f '/etc/profile' ]] && ! grep -q 'export LD_PRELOAD="$LD_PRELOAD /usr/lib64/libpython2.7.so"' /etc/profile; then
+    echo 'export LD_PRELOAD="$LD_PRELOAD /usr/lib64/libpython2.7.so"' >> /etc/profile
+fi
+
+echo 'Finished installing Python 2.7'
+# End of Python 2.7 Setup
 
 # Start of GCC 4.8 Setup
 echo 'Installing GCC 4.8'
