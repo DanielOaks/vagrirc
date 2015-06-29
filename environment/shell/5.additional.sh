@@ -1,7 +1,7 @@
 #/usr/bin/env sh
 # Additional packages setup
 
-CACHE_FOLDER=/environment/cache/repos
+CACHE_FOLDER=/environment/cache/packages
 
 # Start of Additional Packages Setup
 echo 'Installing additional packages'

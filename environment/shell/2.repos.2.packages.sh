@@ -2,7 +2,7 @@
 # Repos Setup
 # Mostly taken from the wonderful PuPHPet project, used under the MIT license
 
-CACHE_FOLDER=/environment/cache/repos
+CACHE_FOLDER=/environment/cache/packages
 
 # CentOS release we're using
 OS=centos
