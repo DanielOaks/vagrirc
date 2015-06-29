@@ -13,6 +13,7 @@
 
 import os
 import shutil
+import configparser
 
 import yaml
 
@@ -42,7 +43,7 @@ class AcidServiceBot(BaseServiceBot):
         config_files = {
             'pyva-native': [
                 os.path.join(self.source_folder, 'pyva', 'pyva-native', 'pyva-cpp', 'make.example.properties'),
-                os.path.join(folder, 'pyva', 'pyva-native', 'pyva-cpp', 'make.properties'),
+                os.path.join(folder, 'make.properties'),
             ],
             'acid': [
                 os.path.join(self.source_folder, 'acid', 'acidictive.example.yml'),
@@ -52,18 +53,23 @@ class AcidServiceBot(BaseServiceBot):
                 os.path.join(self.source_folder, 'pyva', 'pyva.example.yml'),
                 os.path.join(folder, 'pyva.yml'),
             ],
+            'conf': [
+                os.path.join(self.source_folder, 'pyva', 'config.example.ini'),
+                os.path.join(folder, 'config.ini'),
+            ],
         }
 
         # create folders
         output_config_dir = os.path.join(folder, 'pyva', 'pyva-native', 'pyva-cpp')
         if not os.path.exists(output_config_dir):
             os.makedirs(output_config_dir)
-        output_config_dir = os.path.join(folder, 'acid')
-        if not os.path.exists(output_config_dir):
-            os.makedirs(output_config_dir)
 
         # pyva-native compilation makefile
         orig, new = config_files['pyva-native']
+        shutil.copyfile(orig, new)
+
+        # pyva config file
+        orig, new = config_files['pyva']
         shutil.copyfile(orig, new)
 
         # aciditive config file
@@ -90,6 +96,24 @@ class AcidServiceBot(BaseServiceBot):
         with open(new, 'w') as config_file:
             config_file.write(yaml.dump(conf))
 
+        # config.ini config file
+        orig, new = config_files['conf']
+        with open(orig, 'r') as config_file:
+            config_data = config_file.read()
+
+        conf = configparser.ConfigParser()
+        conf.read_string(config_data, orig)
+
+        # setting info
+        conf['database']['host'] = '127.0.0.1'
+        conf['database']['user'] = 'pyps'
+        conf['database']['passwd'] = 'marleymoo'
+        conf['database']['db'] = 'pypsd'
+
+        # and writing it out
+        with open(new, 'w') as config_file:
+            conf.write(config_file)
+
     def write_build_files(self, folder, src_folder, bin_folder, build_folder, config_folder):
         """Write build files to the given folder."""
         build_file = """#!/usr/bin/env sh
@@ -97,14 +121,16 @@ mkdir -p {bin_folder}
 cp -R {src_folder}/* {bin_folder}
 cd {bin_folder}
 
-cp {config_folder}/pyva/pyva-native/pyva-cpp/make.properties {bin_folder}/pyva/pyva-native/pyva-cpp/
+cp {config_folder}/make.properties {bin_folder}/pyva/pyva-native/pyva-cpp/
 
 mvn install
 
 ln -s pyva/pyva-native/pyva-cpp/libpyva.so libpyva.so
-sudo pip install -r pyva/requirements.txt
+sudo pip2.7 install -r pyva/requirements.txt --allow-external py-dom-xpath --allow-unverified py-dom-xpath
 
-cp {config_folder}/acid/acidictive.yml {bin_folder}/acid/acidictive.yml
+cp {config_folder}/acidictive.yml {bin_folder}/acidictive.yml
+cp {config_folder}/pyva.yml {bin_folder}/pyva.yml
+cp {config_folder}/config.ini {bin_folder}/config.ini
 """.format(src_folder=src_folder, bin_folder=bin_folder, config_folder=config_folder)
 
         build_filename = os.path.join(folder, 'build')

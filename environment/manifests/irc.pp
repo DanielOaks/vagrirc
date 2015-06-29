@@ -4,3 +4,9 @@ mysql::db { 'acidcore':
   password => 'acidpass',
   host     => 'localhost',
 }
+
+mysql::db { 'pypsd':
+  user     => 'pyps',
+  password => 'marleymoo',
+  host     => 'localhost',
+}
