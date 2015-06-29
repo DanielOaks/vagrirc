@@ -47,6 +47,7 @@ Vagrant.configure(2) do |config|
   config.vm.provision "shell", path: "environment/shell/3.ruby.1.init.sh"
   config.vm.provision "shell", path: "environment/shell/3.ruby.2.update.sh"
   config.vm.provision "shell", path: "environment/shell/4.puppet.sh"
+  config.vm.provision "shell", path: "environment/shell/5.additional.sh"
 
   # Puppet
   config.vm.provision "shell", inline: "gem install librarian-puppet"
