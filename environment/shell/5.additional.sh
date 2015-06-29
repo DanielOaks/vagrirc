@@ -1,15 +1,28 @@
 #/usr/bin/env sh
 # Additional packages setup
 
-# Start of mysql devel Setup
-echo 'Installing mysql devel'
+# Start of Additional Packages Setup
+echo 'Installing additional packages'
+yum -y install python-devel >/dev/null
+yum -y install python-pip >/dev/null
+
+yum -y install python34u >/dev/null
+yum -y install python34u-pip >/dev/null
+
 yum -y install mysql-devel >/dev/null
-echo 'Finished installing mysql devel'
-# End of mysql devel Setup
+echo 'Finished installing additional packages'
+# End of Additional Packages Setup
 
 # Start of JDK Setup
 echo 'Installing JDK 1.8.0'
 yum -y install java-1.8.0-openjdk >/dev/null
+
+if [[ -f '/root/.bashrc' ]] && ! grep -q 'export JAVA_HOME="/usr/lib/jvm/jre-1.8.0-openjdk"' /root/.bashrc; then
+    echo 'export JAVA_HOME="/usr/lib/jvm/jre-1.8.0-openjdk"' >> /root/.bashrc
+fi
+if [[ -f '/etc/profile' ]] && ! grep -q 'export JAVA_HOME="/usr/lib/jvm/jre-1.8.0-openjdk"' /etc/profile; then
+    echo 'export JAVA_HOME="/usr/lib/jvm/jre-1.8.0-openjdk"' >> /etc/profile
+fi
 echo 'Finished installing JDK 1.8.0'
 # End of JDK Setup
 
@@ -41,13 +54,6 @@ if [[ -f '/root/.bashrc' ]] && ! grep -q 'export M2_HOME="/usr/local/maven"' /ro
 fi
 if [[ -f '/etc/profile' ]] && ! grep -q 'export M2_HOME="/usr/local/maven"' /etc/profile; then
     echo 'export M2_HOME="/usr/local/maven"' >> /etc/profile
-fi
-
-if [[ -f '/root/.bashrc' ]] && ! grep -q 'export JAVA_HOME="/usr/lib/jvm/jre-1.8.0-openjdk"' /root/.bashrc; then
-    echo 'export JAVA_HOME="/usr/lib/jvm/jre-1.8.0-openjdk"' >> /root/.bashrc
-fi
-if [[ -f '/etc/profile' ]] && ! grep -q 'export JAVA_HOME="/usr/lib/jvm/jre-1.8.0-openjdk"' /etc/profile; then
-    echo 'export JAVA_HOME="/usr/lib/jvm/jre-1.8.0-openjdk"' >> /etc/profile
 fi
 echo 'Finished adding Maven'
 # End of Maven Initial Setup <<<
