@@ -88,7 +88,8 @@ class AcidServiceBot(BaseServiceBot):
     def write_build_files(self, folder, src_folder, bin_folder, build_folder, config_folder):
         """Write build files to the given folder."""
         build_file = """#!/usr/bin/env sh
-cp -R {src_folder} {bin_folder}
+mkdir -p {bin_folder}
+cp -R {src_folder}/* {bin_folder}
 cd {bin_folder}
 
 cp {config_folder}/pyva/pyva-native/pyva-cpp/make.properties {bin_folder}/pyva/pyva-native/pyva-cpp/
@@ -96,7 +97,7 @@ cp {config_folder}/pyva/pyva-native/pyva-cpp/make.properties {bin_folder}/pyva/p
 mvn install
 
 ln -s pyva/pyva-native/pyva-cpp/libpyva.so libpyva.so
-pip install -r requirements.txt
+sudo pip install -r pyva/requirements.txt
 
 cp {config_folder}/acid/acidictive.yml {bin_folder}/acid/acidictive.yml
 """.format(src_folder=src_folder, bin_folder=bin_folder, config_folder=config_folder)
