@@ -44,6 +44,8 @@ config_initial_replacements = [
     re.compile(r'\n\s*flags = need_ident;'),
     ('hub = no;', 'hub = yes;'),
     ('throttle_time = 2 seconds;', 'throttle_time = 0;'),  # else we get locked out during config
+    ('service.someserver', 'services.dnt'),
+    ('stats.someserver', 'stats.dnt'),
 ]
 
 config_replacements = {
@@ -73,6 +75,7 @@ OPERATOR_BLOCK = '''operator {{
 
     user = "*@127.0.0.1";
     user = "*@localhost";
+    user = "*@10.*";
 
     password = "{password}";
     encrypted = no;
