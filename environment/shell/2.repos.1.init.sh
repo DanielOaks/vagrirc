@@ -10,7 +10,7 @@ RELEASE=6
 
 
 # Start of PuPHPet Initial Setup <<<
-echo 'Adding repos: elrepo, epel, scl'
+echo 'Adding repos: elrepo, epel, ius, scl'
 perl -p -i -e 's@enabled=1@enabled=0@gi' /etc/yum/pluginconf.d/fastestmirror.conf
 perl -p -i -e 's@#baseurl=http://mirror.centos.org/centos/\$releasever/os/\$basearch/@baseurl=http://mirror.rackspace.com/CentOS//\$releasever/os/\$basearch/\nenabled=1@gi' /etc/yum.repos.d/CentOS-Base.repo
 perl -p -i -e 's@#baseurl=http://mirror.centos.org/centos/\$releasever/updates/\$basearch/@baseurl=http://mirror.rackspace.com/CentOS//\$releasever/updates/\$basearch/\nenabled=1@gi' /etc/yum.repos.d/CentOS-Base.repo
@@ -19,14 +19,17 @@ perl -p -i -e 's@#baseurl=http://mirror.centos.org/centos/\$releasever/extras/\$
 if [ "${RELEASE}" == 6 ]; then
     EL_REPO='http://www.elrepo.org/elrepo-release-6-6.el6.elrepo.noarch.rpm'
     EPEL='https://dl.fedoraproject.org/pub/epel/6/x86_64/epel-release-6-8.noarch.rpm'
+    IUS='https://dl.iuscommunity.org/pub/ius/stable/CentOS/6/x86_64/ius-release-1.0-14.ius.centos6.noarch.rpm'
 else
     EL_REPO='http://www.elrepo.org/elrepo-release-7.0-2.el7.elrepo.noarch.rpm'
     EPEL='https://dl.fedoraproject.org/pub/epel/7/x86_64/e/epel-release-7-5.noarch.rpm'
+    IUS='https://dl.iuscommunity.org/pub/ius/stable/CentOS/7/x86_64/ius-release-1.0-14.ius.centos7.noarch.rpm'
 fi
 
 # caching
 EL_REPO_CACHE="${CACHE_FOLDER}/$(echo ${EL_REPO} | awk -F/ '{print $NF}')"
 EPEL_CACHE="${CACHE_FOLDER}/$(echo ${EPEL} | awk -F/ '{print $NF}')"
+IUS_CACHE="${CACHE_FOLDER}/$(echo ${IUS} | awk -F/ '{print $NF}')"
 
 mkdir -p "$CACHE_FOLDER"
 if [ ! -e "${EL_REPO_CACHE}" ]; then
@@ -35,12 +38,16 @@ fi
 if [ ! -e "${EPEL_CACHE}" ]; then
     wget "${EPEL}" -O "${EPEL_CACHE}"
 fi
+if [ ! -e "${IUS_CACHE}" ]; then
+    wget "${IUS}" -O "${IUS_CACHE}"
+fi
 
 yum -y --nogpgcheck install "${EL_REPO_CACHE}" >/dev/null
 yum -y --nogpgcheck install "${EPEL_CACHE}" >/dev/null
+yum -y --nogpgcheck install "${IUS_CACHE}" >/dev/null
 yum -y install centos-release-SCL >/dev/null
 
 yum clean all >/dev/null
 yum -y check-update >/dev/null
-echo 'Finished adding repos: elrep, epel, scl'
+echo 'Finished adding repos: elrep, epel, ius, scl'
 # Unfinished End of PuPHPet Initial Setup <<<

@@ -21,6 +21,6 @@ yum -y groupinstall 'Development Tools' >/dev/null
 echo 'Finished installing Development Tools'
 # >>> End of PuPHPet Initial Setup
 
-echo 'Installing Python 3.3'
-yum -y install python33 >/dev/null
-echo 'Finished installing Python 3.3'
+echo 'Installing Python 3.4'
+yum -y install python34u >/dev/null
+echo 'Finished installing Python 3.4'
