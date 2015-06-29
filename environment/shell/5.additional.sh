@@ -1,11 +1,13 @@
 #/usr/bin/env sh
 # Additional packages setup
 
+CACHE_FOLDER=/environment/cache/repos
+
 # Start of Additional Packages Setup
 echo 'Installing additional packages'
-yum -y install python27 python27-devel python27-tools python27-pip >/dev/null
+yum -y --enablerepo=scl install python27 python27-runtime python27-python-pip >/dev/null
 
-yum -y install python34u python34u-devel python34u-pip >/dev/null
+yum -y install python34u python34u-runtime python34u-libs python34u-devel python34u-pip >/dev/null
 
 yum -y install mysql-devel >/dev/null
 echo 'Finished installing additional packages'
@@ -39,11 +41,11 @@ echo 'Installing JDK 1.8.0'
 yum -y install java-1.8.0-openjdk >/dev/null
 yum -y install java-1.8.0-openjdk-devel >/dev/null
 
-if [[ -f '/root/.bashrc' ]] && ! grep -q 'export JAVA_HOME="/usr/lib/jvm/jre-1.8.0-openjdk"' /root/.bashrc; then
-    echo 'export JAVA_HOME="/usr/lib/jvm/jre-1.8.0-openjdk"' >> /root/.bashrc
+if [[ -f '/root/.bashrc' ]] && ! grep -q 'export JAVA_HOME="/usr/lib/jvm/java"' /root/.bashrc; then
+    echo 'export JAVA_HOME="/usr/lib/jvm/java"' >> /root/.bashrc
 fi
-if [[ -f '/etc/profile' ]] && ! grep -q 'export JAVA_HOME="/usr/lib/jvm/jre-1.8.0-openjdk"' /etc/profile; then
-    echo 'export JAVA_HOME="/usr/lib/jvm/jre-1.8.0-openjdk"' >> /etc/profile
+if [[ -f '/etc/profile' ]] && ! grep -q 'export JAVA_HOME="/usr/lib/jvm/java"' /etc/profile; then
+    echo 'export JAVA_HOME="/usr/lib/jvm/java"' >> /etc/profile
 fi
 echo 'Finished installing JDK 1.8.0'
 # End of JDK Setup

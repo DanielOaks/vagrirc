@@ -2,6 +2,8 @@
 # Perl Setup
 # Mostly taken from the wonderful PuPHPet project, used under the MIT license
 
+CACHE_FOLDER=/environment/cache/repos
+
 # CentOS release we're using
 OS=centos
 RELEASE=6
