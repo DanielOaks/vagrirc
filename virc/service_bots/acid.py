@@ -88,8 +88,6 @@ class AcidServiceBot(BaseServiceBot):
 
         # loop through users
         for i, info in enumerate(list(conf['clients'])):
-            password = info['nspass'] * 3
-
             conf['clients'][i]['nspass'] = generate_pass()
 
         # and writing it out
