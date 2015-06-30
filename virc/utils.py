@@ -12,8 +12,23 @@
 # <http://creativecommons.org/publicdomain/zero/1.0/>.
 
 import os
+import random
 
+import names
 import networkx as nx
+
+
+def generate_pass(minimum_length=9):
+    """Return a really simple password.
+
+    This will NOT actally protect against any attackers. It is just so we can
+    have randomly-generated passwords in our config files and such.
+    """
+    password = ''
+    while len(password) < minimum_length:
+        password = '{}_{}'.format(names.get_last_name().lower(), random.randint(0, 9999))
+
+    return password
 
 
 def get_members(zip):

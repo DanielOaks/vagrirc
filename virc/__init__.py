@@ -17,7 +17,6 @@ import random
 import string
 import shutil
 
-import names
 import networkx as nx
 import matplotlib.pyplot as plt
 
@@ -432,9 +431,9 @@ class VircManager:
             current_link_port += 1
 
             # generate link password
-            password = '{}_{}'.format(names.get_last_name().lower(), random.randint(0, 9999))
-            while password in used_passwords or len(password) < 9:
-                password = '{}_{}'.format(names.get_last_name().lower(), random.randint(0, 9999))
+            password = generate_pass()
+            while password in used_passwords:
+                password = generate_pass()
 
             info.append(('password', password))
 
