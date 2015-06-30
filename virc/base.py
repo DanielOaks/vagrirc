@@ -118,7 +118,7 @@ class ReleaseDownloader:
 class BaseSoftware(ReleaseDownloader):
     info = {}
 
-    def init_info(self):
+    def init_info(self, config_folder=None):
         """Initialise user/channel/etc info."""
         ...
 

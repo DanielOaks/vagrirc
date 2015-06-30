@@ -202,7 +202,8 @@ class VircManager:
         info = dict(self.network.info)
 
         for node, server in server_list:
-            server.init_info()
+            server_config_folder = os.path.join(self.configs_base_dir, server.slug)
+            server.init_info(config_folder=server_config_folder)
 
             info['users'].update(server.info['users'])
 

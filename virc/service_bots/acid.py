@@ -18,6 +18,7 @@ import configparser
 import yaml
 
 from ..base import BaseServiceBot
+from ..utils import generate_pass
 
 
 class AcidServiceBot(BaseServiceBot):
@@ -26,12 +27,14 @@ class AcidServiceBot(BaseServiceBot):
     vcs = 'git'
     url = 'https://gitlab.com/rizon/acid.git'
 
-    def init_info(self):
+    def init_info(self, config_folder=None):
         """Create our info."""
         self.info['users'] = {}
 
         # load users from config file
-        config_filename = os.path.join(self.source_folder, 'pyva', 'pyva.example.yml')
+        config_filename = os.path.join(config_folder, 'pyva.yml')
+        if not os.path.exists(config_filename):
+            return
         with open(config_filename, 'r') as config_file:
             config_data = config_file.read()
 
@@ -83,7 +86,20 @@ class AcidServiceBot(BaseServiceBot):
 
         # pyva config file
         orig, new = config_files['pyva']
-        shutil.copyfile(orig, new)
+        with open(orig, 'r') as config_file:
+            config_data = config_file.read()
+
+        conf = yaml.load(config_data)
+
+        # loop through users
+        for i, info in enumerate(list(conf['clients'])):
+            password = info['nspass'] * 3
+
+            conf['clients'][i]['nspass'] = generate_pass()
+
+        # and writing it out
+        with open(new, 'w') as config_file:
+            config_file.write(yaml.dump(conf))
 
         # aciditive config file
         orig, new = config_files['acid']
