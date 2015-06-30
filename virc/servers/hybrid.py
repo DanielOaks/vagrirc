@@ -179,7 +179,7 @@ class HybridServer(BaseServer):
         build_file = """#!/usr/bin/env sh
 cd {src_folder}
 chmod +x ./configure
-./configure --prefix={bin_folder}
+./configure --prefix={bin_folder} --enable-halfops
 make
 make install
 
