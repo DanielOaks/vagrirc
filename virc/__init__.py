@@ -25,7 +25,7 @@ from . import serial
 from . import servers
 from . import services
 from . import service_bots
-from .utils import nodelist
+from .utils import nodelist, generate_pass
 
 version = '0.0.1'
 name_version = 'VagrIRC {}'.format(version)
@@ -311,6 +311,77 @@ class VircManager:
             new_bot = map.MapServiceBot(self.network, bot_type)
             new_bot.link_to(only_client_server)
 
+        # server configs
+        #
+
+        # assign server names and client ports
+        current_client_port = 6667
+        used_names = []
+        used_sids = []
+
+        for server in self.network.nodes():
+            info = {
+                'users': {},
+            }
+
+            # generate name
+            if server.services:
+                server_name = 'services'
+            else:
+                server_name = server.software
+            while server_name in used_names:
+                server_name = names.get_first_name().lower()
+            used_names.append(server_name)
+
+            info['name'] = server_name + '.dnt'
+
+            # generate sid
+            sid = '72A'
+            while sid in used_sids:
+                sid = '{}{}{}'.format(random.randint(0,9), random.randint(0,9), random.choice(string.ascii_uppercase))
+            used_sids.append(sid)
+
+            info['sid'] = sid
+
+            # port for clients to connect on
+            if server.client:
+                info['client_port'] = current_client_port
+                current_client_port += 1
+
+            # and set info
+            server.info = info
+
+        # assign ports and passwords for server links
+        current_link_port = 10000
+        while current_link_port <= current_client_port:
+            current_link_port += 500
+
+        used_passwords = []
+
+        for link in self.network.edges():
+            info = []
+
+            # port for things to connect on
+            info.append(('port', current_link_port))
+            current_link_port += 1
+
+            # generate link password
+            password = generate_pass()
+            while password in used_passwords:
+                password = generate_pass()
+
+            info.append(('password', password))
+
+            nx.set_edge_attributes(self.network, link, info)
+
+        # save network map
+        self.save_network_map()
+
+        # draw a pretty diagram of the network
+        self.draw_network_diagram()
+
+    def draw_network_diagram(self):
+        """Draw a diagram of our network."""
         # calc stats
         stats = map.network_stats(self.network)
 
@@ -382,69 +453,6 @@ class VircManager:
             'edge_color': edge_color,
         })
 
-        # server configs
-        #
-
-        # assign server names and client ports
-        current_client_port = 6667
-        used_names = []
-        used_sids = []
-
-        for server in self.network.nodes():
-            info = {
-                'users': {},
-            }
-
-            # generate name
-            if server.services:
-                server_name = 'services'
-            else:
-                server_name = server.software
-            while server_name in used_names:
-                server_name = names.get_first_name().lower()
-            used_names.append(server_name)
-
-            info['name'] = server_name + '.dnt'
-
-            # generate sid
-            sid = '72A'
-            while sid in used_sids:
-                sid = '{}{}{}'.format(random.randint(0,9), random.randint(0,9), random.choice(string.ascii_uppercase))
-            used_sids.append(sid)
-
-            info['sid'] = sid
-
-            # port for clients to connect on
-            if server.client:
-                info['client_port'] = current_client_port
-                current_client_port += 1
-
-            # and set info
-            server.info = info
-
-        # assign ports and passwords for server links
-        current_link_port = 10000
-        while current_link_port <= current_client_port:
-            current_link_port += 500
-
-        used_passwords = []
-
-        for link in self.network.edges():
-            info = []
-
-            # port for things to connect on
-            info.append(('port', current_link_port))
-            current_link_port += 1
-
-            # generate link password
-            password = generate_pass()
-            while password in used_passwords:
-                password = generate_pass()
-
-            info.append(('password', password))
-
-            nx.set_edge_attributes(self.network, link, info)
-
         # labels
         nx.draw_networkx_labels(self.network, pos, **{
             'edgelist': [],
@@ -455,6 +463,3 @@ class VircManager:
         })
 
         plt.savefig(self.map_filename)
-
-        # save network map
-        self.save_network_map()
