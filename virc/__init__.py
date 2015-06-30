@@ -288,9 +288,9 @@ class VircManager:
                 },
                 'services': {
                     'password': password,
-                    'level': 'root',
                 },
                 'email': 'oper@example.com',
+                'level': 'root',
             }
 
         # ensure ircd and services exist

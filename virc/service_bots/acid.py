@@ -73,6 +73,7 @@ class AcidServiceBot(BaseServiceBot):
                 os.path.join(self.source_folder, 'pyva', 'config.example.ini'),
                 os.path.join(folder, 'config.ini'),
             ],
+            'sql': os.path.join(folder, 'acid.sql'),
         }
 
         # pyva-native compilation makefile
@@ -88,7 +89,7 @@ class AcidServiceBot(BaseServiceBot):
         conf = yaml.load(config_data)
 
         # loop through users
-        for i, info in enumerate(list(conf['clients'])):
+        for i, nfo in enumerate(list(conf['clients'])):
             conf['clients'][i]['nspass'] = generate_pass()
 
         # and writing it out
@@ -139,6 +140,17 @@ class AcidServiceBot(BaseServiceBot):
         with open(new, 'w') as config_file:
             conf.write(config_file)
 
+        # sql file
+        # # # #
+        sql_lines = []
+        for name, info in info['users'].items():
+            if info.get('level', None) == 'root':
+                name = name.replace('\\', '\\\\').replace('"', '\\"')  # XXX - really bad escaping
+                sql_lines.append('INSERT IGNORE INTO `access` (user,flags) VALUES ("{}",1)\n'.format(name))
+
+        with open(config_files['sql'], 'w') as sql_file:
+            sql_file.write('\n'.join(sql_lines))
+
     def write_build_files(self, folder, src_folder, bin_folder, build_folder, config_folder):
         """Write build files to the given folder."""
         build_file = """#!/usr/bin/env sh
@@ -158,6 +170,7 @@ cp {config_folder}/pyva.yml {bin_folder}/pyva.yml
 cp {config_folder}/config.ini {bin_folder}/config.ini
 
 mysql -u 'acid' --password=acidpass --database=acidcore < {bin_folder}/acid/acidcore.sql
+mysql -u 'acid' --password=acidpass --database=acidcore < {config_folder}/acid.sql
 """.format(src_folder=src_folder, bin_folder=bin_folder, config_folder=config_folder)
 
         build_filename = os.path.join(folder, 'build')

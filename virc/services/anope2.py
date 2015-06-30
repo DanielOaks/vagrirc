@@ -159,6 +159,8 @@ class Anope2Services(BaseServices):
                 continue
 
             level = info['services'].get('level', None)
+            if level is None:
+                level = info.get('level', None)  # may also be root
 
             # convert from general names to specific names
             if level == 'root':
