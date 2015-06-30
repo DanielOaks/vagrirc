@@ -100,7 +100,8 @@ class Anope2Services(BaseServices):
 
     def write_config(self, folder, info):
         """Write config file to the given folder."""
-        # load original config file
+        # master config file
+        # # # #
         original_config_file = os.path.join(self.source_folder, 'data', 'example.conf')
         with open(original_config_file, 'r') as config_file:
             config_data = config_file.read()
@@ -182,7 +183,8 @@ class Anope2Services(BaseServices):
         with open(output_config_file, 'w') as config_file:
             config_file.write(config_data)
 
-        # load original config file
+        # operserv config file
+        # # # #
         original_config_file = os.path.join(self.source_folder, 'data', 'operserv.example.conf')
         with open(original_config_file, 'r') as config_file:
             config_data = config_file.read()

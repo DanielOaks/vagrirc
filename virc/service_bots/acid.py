@@ -80,6 +80,7 @@ class AcidServiceBot(BaseServiceBot):
         shutil.copyfile(orig, new)
 
         # pyva config file
+        # # # #
         orig, new = config_files['pyva']
         with open(orig, 'r') as config_file:
             config_data = config_file.read()
@@ -95,6 +96,7 @@ class AcidServiceBot(BaseServiceBot):
             config_file.write(yaml.dump(conf))
 
         # aciditive config file
+        # # # #
         orig, new = config_files['acid']
         with open(orig, 'r') as config_file:
             config_data = config_file.read()
@@ -119,6 +121,7 @@ class AcidServiceBot(BaseServiceBot):
             config_file.write(yaml.dump(conf))
 
         # config.ini config file
+        # # # #
         orig, new = config_files['conf']
         with open(orig, 'r') as config_file:
             config_data = config_file.read()

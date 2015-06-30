@@ -298,7 +298,8 @@ class VircManager:
         services_type = services.available[services_type]().name
 
         # generate network
-        #
+        # # # #
+
         map.MapClientServer(self.network, ircd_type)
         only_client_server = self.network.nodes()[0]
 
@@ -311,8 +312,8 @@ class VircManager:
             new_bot = map.MapServiceBot(self.network, bot_type)
             new_bot.link_to(only_client_server)
 
-        # server configs
-        #
+        # server and link info
+        # # # #
 
         # assign server names and client ports
         current_client_port = 6667
@@ -385,8 +386,7 @@ class VircManager:
         # calc stats
         stats = map.network_stats(self.network)
 
-        # draw network map to a file
-        #
+        # colours and positioning
         edge_color = '#bbbbbb'
         node_edge_color = '#cccccc'
 
@@ -400,6 +400,7 @@ class VircManager:
             print('Warning: Using Shell layout instead of Graphviz layout. Display may not look nice or legible.')
 
         # client servers
+        # # # #
         # NOTE: we do this because nx.draw seems to apply colours weirdly when the
         #   number of args here matches the number of servers, eg if 3 client servers
         #   and 3 numbers in colour tuple, apply all sorts of dodgy stuff, etc
@@ -418,6 +419,7 @@ class VircManager:
             nodes.set_edgecolor(node_edge_color)
 
         # services
+        # # # #
         if stats['service_servers'] == 3:
             services_color = (0.7, 0.9, 0.7, 1.0)
         else:
@@ -433,6 +435,7 @@ class VircManager:
             nodes.set_edgecolor(node_edge_color)
 
         # service bots
+        # # # #
         if stats['service_bots'] == 3:
             service_bots_color = (0.7, 0.7, 0.9, 1.0)
         else:
