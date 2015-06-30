@@ -156,6 +156,8 @@ sudo pip2.7 install -r pyva/requirements.txt --allow-external py-dom-xpath --all
 cp {config_folder}/acidictive.yml {bin_folder}/acidictive.yml
 cp {config_folder}/pyva.yml {bin_folder}/pyva.yml
 cp {config_folder}/config.ini {bin_folder}/config.ini
+
+mysql -u 'acid' --password=acidpass --database=acidcore < {bin_folder}/acid/acidcore.sql
 """.format(src_folder=src_folder, bin_folder=bin_folder, config_folder=config_folder)
 
         build_filename = os.path.join(folder, 'build')
