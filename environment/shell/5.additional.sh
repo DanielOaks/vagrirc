@@ -1,6 +1,7 @@
 #/usr/bin/env sh
 # Additional packages setup
 
+BUILD_FOLDER=/build
 CACHE_FOLDER=/environment/cache/packages
 
 # Start of Additional Packages Setup
@@ -8,6 +9,14 @@ echo 'Installing additional packages'
 yum -y --enablerepo=scl install python27 python27-runtime python27-devel python27-pip >/dev/null
 
 yum -y install python34u python34u-runtime python34u-libs python34u-devel python34u-pip >/dev/null
+
+yum -y install autoconf automake libtool >/dev/null
+
+yum -y install libtool-ltdl-devel >/dev/null
+
+yum -y install jansson jansson-devel >/dev/null
+
+yum -y install lua-devel >/dev/null
 
 yum -y install mysql-devel >/dev/null
 echo 'Finished installing additional packages'
@@ -36,6 +45,33 @@ if [[ -f '/etc/profile' ]] && ! grep -q 'export PATH="/opt/rh/devtoolset-2/root/
 fi
 echo 'Finished installing GCC 4.8'
 # End of GCC 4.8 Setup
+
+# Start of Autotools Setup
+echo 'Installing autoconf 2.69'
+AUTOCONF='http://ftp.gnu.org/gnu/autoconf/autoconf-2.69.tar.gz'
+AUTOCONF_CACHE="${CACHE_FOLDER}/$(echo ${AUTOCONF} | awk -F/ '{print $NF}')"
+
+mkdir -p "$CACHE_FOLDER"
+if [ ! -e "${AUTOCONF_CACHE}" ]; then
+    wget "${AUTOCONF}" -O "${AUTOCONF_CACHE}"
+fi
+
+AUTOCONF_BUILD="${BUILD_FOLDER}/$(echo ${AUTOCONF} | awk -F/ '{print $NF}' | awk -F. 'sub(FS $NF,x)' | awk -F. 'sub(FS $NF,x)')"
+
+mkdir -p "$BUILD_FOLDER"
+if [ ! -e "${AUTOCONF_BUILD}" ]; then
+    cd "${BUILD_FOLDER}"
+    tar xvfvz "${AUTOCONF_CACHE}"
+
+    cd "${AUTOCONF_BUILD}"
+
+    ./configure
+    make
+    make install
+fi
+
+echo 'Finished installing autoconf 2.69'
+# End of Autotools Setup
 
 # Start of JDK Setup
 echo 'Installing JDK 1.8.0'
