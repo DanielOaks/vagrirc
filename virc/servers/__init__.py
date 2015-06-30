@@ -12,7 +12,9 @@
 # <http://creativecommons.org/publicdomain/zero/1.0/>.
 
 from . import hybrid
+from . import plexus4
 
 available = {
     'hybrid': hybrid.HybridServer,
+    'plexus4': plexus4.Plexus4Server,
 }

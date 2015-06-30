@@ -140,6 +140,9 @@ class Anope2Services(BaseServices):
         if server_sw == 'hybrid':
             server_sw_name = 'hybrid'
             config_data = config_data.replace('casemap = "ascii"', 'casemap = "rfc1459"')
+        elif server_sw == 'plexus4':
+            server_sw_name = 'plexus'
+            config_data = config_data.replace('casemap = "ascii"', 'casemap = "rfc1459"')
         elif server_sw == 'inspircd':
             server_sw_name = 'inspircd20'
         else:
