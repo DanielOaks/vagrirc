@@ -159,7 +159,7 @@ cp {config_folder}/config.ini {bin_folder}/config.ini
 
 cd {bin_folder}
 JAR=acid/target/acid-acid-4.0-SNAPSHOT-jar-with-dependencies.jar
-LD_PRELOAD="/usr/lib64/libpython2.7.so" java -XX:+HeapDumpOnOutOfMemoryError -Xms64m -Xmx256m -jar $JAR
+LD_PRELOAD="/usr/lib64/libpython2.7.so" java -XX:+HeapDumpOnOutOfMemoryError -Xms64m -Xmx256m -jar $JAR >geoserv.log 2>&1 &
 """.format(src_folder=src_folder, bin_folder=bin_folder, config_folder=config_folder)
 
         launch_filename = os.path.join(folder, 'launch')
