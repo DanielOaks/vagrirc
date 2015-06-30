@@ -99,8 +99,10 @@ class VircManager:
         # remove old config files
         if os.path.exists(self.build_base_dir):
             shutil.rmtree(self.build_base_dir)
+        os.makedirs(self.build_base_dir)
         if os.path.exists(self.launch_base_dir):
             shutil.rmtree(self.launch_base_dir)
+        os.makedirs(self.launch_base_dir)
 
         # build file links
         build_files = []
@@ -175,6 +177,7 @@ class VircManager:
         # remove old source files
         if os.path.exists(self.src_base_dir):
             shutil.rmtree(self.src_base_dir)
+        os.makedirs(self.src_base_dir)
 
         # write software folders
         for node, server in self.server_list():
@@ -187,6 +190,7 @@ class VircManager:
         # remove old config files
         if os.path.exists(self.configs_base_dir):
             shutil.rmtree(self.configs_base_dir)
+        os.makedirs(self.configs_base_dir)
 
         # write new config files
         server_list = self.server_list()
@@ -194,6 +198,7 @@ class VircManager:
 
         for node, server in server_list:
             server_config_folder = os.path.join(self.configs_base_dir, server.slug)
+            os.makedirs(server_config_folder)
 
             server.write_config(server_config_folder, info)
 
