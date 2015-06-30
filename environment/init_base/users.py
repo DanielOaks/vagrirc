@@ -12,6 +12,7 @@
 # <http://creativecommons.org/publicdomain/zero/1.0/>.
 
 import socket
+from time import sleep
 
 from envelope import RFC1459Message
 
@@ -39,7 +40,17 @@ class User:
     # send/receive
     def recv(self, number_of_bytes=4096):
         """Receive bytes from the IRC server."""
-        self._new_data += self.sock.recv(number_of_bytes).decode('utf-8', 'replace')
+        try:
+            new_data = self.sock.recv(number_of_bytes).decode('utf-8', 'replace')
+        except socket.timeout as ex:
+            error = ex.args[0]
+
+            if error == 'timed out':
+                return []
+            else:
+                raise ex
+
+        self._new_data += new_data
         raw_messages = []
         message_buffer = ''
 
@@ -77,6 +88,7 @@ class User:
         """Connect, execute commands, and then disconnect."""
         self.sock = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
         self.sock.connect((self.network, self.port))
+        self.sock.settimeout(0.3)
 
         # should really be async but we're lazy
         self.recv()
@@ -93,6 +105,8 @@ class User:
                     self.rpl_welcome()
                     online = False
 
+        self.recv()
+        sleep(1.5)
         self.recv()
         self.quit()
 
