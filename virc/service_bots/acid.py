@@ -75,11 +75,6 @@ class AcidServiceBot(BaseServiceBot):
             ],
         }
 
-        # create folders
-        output_config_dir = os.path.join(folder, 'pyva', 'pyva-native', 'pyva-cpp')
-        if not os.path.exists(output_config_dir):
-            os.makedirs(output_config_dir)
-
         # pyva-native compilation makefile
         orig, new = config_files['pyva-native']
         shutil.copyfile(orig, new)
