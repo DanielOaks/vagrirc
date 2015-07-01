@@ -83,6 +83,11 @@ class User:
             message = message.to_message()
         self.send_raw('{}\r\n'.format(message))
 
+    def send_message(self, verb, **kwargs):
+        """Send the given message to the IRC server."""
+        msg = RFC1459Message.from_data(verb, **kwargs)
+        self.send(msg)
+
     # init
     def run(self):
         """Connect, execute commands, and then disconnect."""
@@ -93,17 +98,19 @@ class User:
         # should really be async but we're lazy
         self.recv()
 
-        self.send('NICK {}'.format(self.nick))
-        self.send('USER {} 0 * :{}'.format(self.username, self.realname))
+        self.send_message('NICK', params=[self.nick])
+        self.send_message('USER', params=[self.username, 0, '*', self.realname])
 
         # main event loop
         online = True
         while online:
             messages = self.recv()
             for message in messages:
-                if message.verb.lower() == '001':
+                if message.verb == '001':
                     self.rpl_welcome()
                     online = False
+                elif message.verb.lower() == 'ping':
+                    self.send_message('PONG', params=message.params)
 
         self.recv()
         sleep(1.5)
@@ -119,12 +126,12 @@ class User:
                 self.recv()
 
     def quit(self):
-        self.send('QUIT')
+        self.send_message('QUIT')
 
     # irc commands
     def privmsg(self, target, msg):
         """Send a PRIVMSG."""
-        self.send('PRIVMSG {} :{}'.format(target, msg))
+        self.send_message('PRIVMSG', params=[target, msg])
 
     # command list
     def cmd_nickserv(self, info):
