@@ -49,7 +49,7 @@ class AcidServiceBot(BaseServiceBot):
             self.info['users'][nick] = {
                 'services': {
                     'password': password,
-                    'level': 'service bot',
+                    'level': 'acid service bot',
                 },
                 'username': user,
             }

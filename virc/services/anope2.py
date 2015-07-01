@@ -48,7 +48,16 @@ OPERATOR_BLOCK = r"""oper
     name = "{name}"
     type = "{level}"
     vhost = "oper.dnt"
-}}"""
+}}
+"""
+
+ADDITIONAL_BLOCKS = r"""opertype
+{
+    name = "Acid Service Bot"
+    commands = "chanserv/status *"
+    privs = "chanserv/status *"
+}
+"""
 
 
 class Anope2Services(BaseServices):
@@ -156,6 +165,9 @@ class Anope2Services(BaseServices):
                                      password=self.info['links'][0]['password'])
         config_data = uplink_regex.sub(uplink, config_data)
 
+        # custom blocks
+        config_data += ADDITIONAL_BLOCKS
+
         # opers
         for name, info in info['users'].items():
             if 'services' not in info:
@@ -168,8 +180,8 @@ class Anope2Services(BaseServices):
             # convert from general names to specific names
             if level == 'root':
                 level = 'Services Root'
-            elif level == 'service bot':
-                level = 'Services Root'  # xxx - lazy, but works for now
+            elif level == 'acid service bot':
+                level = 'Acid Service Bot'
 
             # only add operator block if they have a valid level
             if level:

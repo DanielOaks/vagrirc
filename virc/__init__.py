@@ -202,6 +202,18 @@ class VircManager:
 
             server.write_config(server_config_folder, info)
 
+        # some info can only be obtained after the config files have been
+        #   written, so we write them twice after getting new server info
+        server_list = self.server_list()
+        info = self.info_from_server_list(server_list)
+
+        for node, server in server_list:
+            server_config_folder = os.path.join(self.configs_base_dir, server.slug)
+            shutil.rmtree(server_config_folder)
+            os.makedirs(server_config_folder)
+
+            server.write_config(server_config_folder, info)
+
     def info_from_server_list(self, server_list):
         """Return info and server list."""
         info = dict(self.network.info)
