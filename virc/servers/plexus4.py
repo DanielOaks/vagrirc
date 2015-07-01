@@ -67,7 +67,7 @@ CONN_BLOCK = r"""connect {{
 
 LISTEN_BLOCK = r"""\1\nlisten {{
     port = {client_port};
-    flags = hidden;
+    flags = hidden, server;
     port = {link_ports};
 }};
 {connect_blocks}"""
