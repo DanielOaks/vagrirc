@@ -18,6 +18,8 @@ yum -y install jansson jansson-devel >/dev/null
 
 yum -y install lua-devel >/dev/null
 
+yum -y install libxslt-devel >/dev/null
+
 yum -y install mysql-devel >/dev/null
 echo 'Finished installing additional packages'
 # End of Additional Packages Setup
