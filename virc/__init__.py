@@ -66,6 +66,31 @@ class VircManager:
         with open(self.serial_filename, 'r') as serial_file:
             self.network = serial.load(serial_file.read())
 
+    def supported_software(self):
+        """Reply with a dict of supported software."""
+        sw = {
+            'ircd': {},
+            'services': {},
+            'service_bots': {},
+        }
+
+        for name, cls in servers.available.items():
+            sw['ircd'][name] = {
+                'description': cls.__doc__,
+            }
+
+        for name, cls in services.available.items():
+            sw['services'][name] = {
+                'description': cls.__doc__,
+            }
+
+        for name, cls in service_bots.available.items():
+            sw['service_bots'][name] = {
+                'description': cls.__doc__,
+            }
+
+        return sw
+
     def write_init_files(self):
         """Write necessary init files for our software."""
         # remove old config files

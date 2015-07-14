@@ -93,7 +93,7 @@ OPERATOR_BLOCK = '''operator {{
 
 
 class HybridServer(BaseServer):
-    """Implements support for the Hybrid IRCd."""
+    """An advanced, lightweight Internet Relay Chat Daemon (ircd)."""
     name = 'hybrid'
     release = '8.2.8'
     url = 'https://github.com/ircd-hybrid/ircd-hybrid/archive/{release}.zip'

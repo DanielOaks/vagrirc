@@ -61,7 +61,7 @@ ADDITIONAL_BLOCKS = r"""opertype
 
 
 class Anope2Services(BaseServices):
-    """Implements support for Anope2 Services."""
+    """A set of IRC services for IRC networks."""
     name = 'anope2'
     release = '2.0.1'
     url = 'https://github.com/anope/anope/archive/{release}.zip'

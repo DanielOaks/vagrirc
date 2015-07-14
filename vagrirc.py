@@ -23,6 +23,7 @@ all once it's online.
 Usage:
     vagrirc.py generate (--oper <name:password>)... [options]
     vagrirc.py write
+    vagrirc.py list
     vagrirc.py (-h | --help)
     vagrirc.py --version
 
@@ -48,9 +49,12 @@ if __name__ == '__main__':
         if service_bots is None:
             service_bots = ''
         service_bots = service_bots.split(',')
-        oper_usernames_and_passwords = [name.split(':', 1) for name in arguments.get('<name:password>', [])]
+        oper_usernames_and_passwords = [
+            name.split(':', 1) for name in arguments.get('<name:password>', [])
+        ]
 
-        manager.generate(ircd_type=ircd, services_type=services, service_bots=service_bots, opers=oper_usernames_and_passwords)
+        manager.generate(ircd_type=ircd, services_type=services, service_bots=service_bots,
+                         opers=oper_usernames_and_passwords)
 
     elif arguments['write']:
         manager = virc.VircManager()
@@ -59,3 +63,21 @@ if __name__ == '__main__':
         manager.write_source_files()
         manager.write_build_files()
         manager.write_init_files()
+
+    elif arguments['list']:
+        manager = virc.VircManager()
+        sw = manager.supported_software()
+
+        print('Supported Software')
+
+        print('\n** IRCd **')
+        for name, info in sorted(sw.get('ircd', {}).items()):
+            print('  {} : {}'.format(name, info['description']))
+
+        print('\n** Services **')
+        for name, info in sorted(sw.get('services', {}).items()):
+            print('  {} : {}'.format(name, info['description']))
+
+        print('\n** Service Bots **')
+        for name, info in sorted(sw.get('service_bots', {}).items()):
+            print('  {} : {}'.format(name, info['description']))

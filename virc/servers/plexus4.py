@@ -96,7 +96,7 @@ OPERATOR_BLOCK = '''operator {{
 
 
 class Plexus4Server(BaseServer):
-    """Implements support for the Plexus4 IRCd."""
+    """A fork of ircd-hybrid for Rizon Chat Network."""
     name = 'plexus4'
     vcs = 'git'
     url = 'https://gitlab.com/rizon/plexus4.git'

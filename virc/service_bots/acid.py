@@ -22,7 +22,7 @@ from ..utils import generate_pass
 
 
 class AcidServiceBot(BaseServiceBot):
-    """Implements support for the Hybrid IRCd."""
+    """Rizon Service Bots."""
     name = 'acid'
     vcs = 'git'
     url = 'https://gitlab.com/rizon/acid.git'
