@@ -92,6 +92,18 @@ class AcidServiceBot(BaseServiceBot):
         for i, nfo in enumerate(list(conf['clients'])):
             conf['clients'][i]['nspass'] = generate_pass()
 
+        # add pyva user
+        conf['clients'].append({
+            'channels': ['py'],
+            'host': 'pyva.rizon.net',
+            'modes': 'ipoU',
+            'name': 'pyva',
+            'nick': 'pyva',
+            'nspass': generate_pass(),
+            'user': 'pyva',
+            'vhost': 'pyva.rizon.net',
+        })
+
         # and writing it out
         with open(new, 'w') as config_file:
             config_file.write(yaml.dump(conf))
