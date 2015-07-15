@@ -27,6 +27,11 @@ class AcidServiceBot(BaseServiceBot):
     vcs = 'git'
     url = 'https://gitlab.com/rizon/acid.git'
 
+    requires = {
+        'ircd': 'plexus4',
+        'services': 'anope2',
+    }
+
     def init_info(self, config_folder=None):
         """Create our info."""
         self.info['users'] = {}

@@ -16,6 +16,7 @@ import json
 import random
 import string
 import shutil
+import inspect
 
 import networkx as nx
 import matplotlib.pyplot as plt
@@ -71,22 +72,28 @@ class VircManager:
         sw = {
             'ircd': {},
             'services': {},
-            'service_bots': {},
+            'service bots': {},
         }
 
         for name, cls in servers.available.items():
+            rn = cls()
             sw['ircd'][name] = {
-                'description': cls.__doc__,
+                'description': inspect.getdoc(rn),
+                'requires': rn.requires,
             }
 
         for name, cls in services.available.items():
+            rn = cls()
             sw['services'][name] = {
-                'description': cls.__doc__,
+                'description': inspect.getdoc(rn),
+                'requires': rn.requires,
             }
 
         for name, cls in service_bots.available.items():
-            sw['service_bots'][name] = {
-                'description': cls.__doc__,
+            rn = cls()
+            sw['service bots'][name] = {
+                'description': inspect.getdoc(rn),
+                'requires': rn.requires,
             }
 
         return sw

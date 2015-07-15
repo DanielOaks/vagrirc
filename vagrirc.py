@@ -23,7 +23,7 @@ all once it's online.
 Usage:
     vagrirc.py generate (--oper <name:password>)... [options]
     vagrirc.py write
-    vagrirc.py list
+    vagrirc.py (list | list-software)
     vagrirc.py (-h | --help)
     vagrirc.py --version
 
@@ -64,20 +64,39 @@ if __name__ == '__main__':
         manager.write_build_files()
         manager.write_init_files()
 
-    elif arguments['list']:
+    elif arguments['list'] or arguments['list-software']:
         manager = virc.VircManager()
         sw = manager.supported_software()
+
+        def req(info):
+            if not info:
+                return ''
+
+            out = 'Requires '
+
+            reqs = []
+
+            for sw_type in ['ircd', 'services', 'service bots']:
+                sw = info.get(sw_type)
+                if sw:
+                    if not isinstance(sw, (list, tuple)):
+                        sw = [sw]
+                    reqs.append('{} [{}]'.format(sw_type, ','.join(sw)))
+
+            out += ', '.join(reqs)
+
+            return out
 
         print('Supported Software')
 
         print('\n** IRCd **')
         for name, info in sorted(sw.get('ircd', {}).items()):
-            print('  {} : {}'.format(name, info['description']))
+            print('  {} : {} {}'.format(name, info['description'], req(info['requires'])))
 
         print('\n** Services **')
         for name, info in sorted(sw.get('services', {}).items()):
-            print('  {} : {}'.format(name, info['description']))
+            print('  {} : {} {}'.format(name, info['description'], req(info['requires'])))
 
         print('\n** Service Bots **')
-        for name, info in sorted(sw.get('service_bots', {}).items()):
-            print('  {} : {}'.format(name, info['description']))
+        for name, info in sorted(sw.get('service bots', {}).items()):
+            print('  {} : {} {}'.format(name, info['description'], req(info['requires'])))
