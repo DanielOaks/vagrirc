@@ -63,7 +63,8 @@ class AcidServiceBot(BaseServiceBot):
         """Write config file to the given folder."""
         config_files = {
             'pyva-native': [
-                os.path.join(self.source_folder, 'pyva', 'pyva-native', 'pyva-cpp', 'make.example.properties'),
+                os.path.join(self.source_folder, 'pyva', 'pyva-native', 'pyva-cpp',
+                             'make.example.properties'),
                 os.path.join(folder, 'make.properties'),
             ],
             'acid': [
@@ -162,8 +163,10 @@ class AcidServiceBot(BaseServiceBot):
         sql_lines = []
         for name, info in info['users'].items():
             if info.get('level', None) == 'root':
-                name = name.replace('\\', '\\\\').replace('"', '\\"')  # XXX - really bad escaping
-                sql_lines.append('INSERT IGNORE INTO `access` (user,flags) VALUES ("{}",1)\n'.format(name))
+                # XXX - really bad escaping
+                name = name.replace('\\', '\\\\').replace('"', '\\"')
+                sql_lines.append('INSERT IGNORE INTO `access` (user,flags) '
+                                 'VALUES ("{}",1)\n'.format(name))
 
         with open(config_files['sql'], 'w') as sql_file:
             sql_file.write('\n'.join(sql_lines))

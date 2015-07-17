@@ -52,14 +52,17 @@ def get_members(zip):
 
 
 def nodelist(network):
-    """Returns a drawable nodelist (for the concentric circle-based drawing functions of networkx)."""
+    """Returns a drawable nodelist.
+
+    This is designed for the concentric circle-based drawing functions of networkx.
+    """
     # first off, find most largestly connected (hub) server for the center
     center = nx.center(network)
     center = center[0]  # returns a list of centers, and we don't want that
 
     # and create the layers off that
-    added_nodes = [center,]
-    shells = [(center,),]  # holds recursive shells
+    added_nodes = [center, ]
+    shells = [(center,), ]  # holds recursive shells
 
     any_added = True
     while any_added:

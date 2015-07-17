@@ -18,6 +18,7 @@ import string
 import shutil
 import inspect
 
+import names
 import networkx as nx
 import matplotlib.pyplot as plt
 
@@ -38,6 +39,7 @@ INIT_FILE_TEMPLATE = '''#!/usr/bin/env python3
 
 class VircManager:
     """Can create and map out an IRC network."""
+
     def __init__(self, irc_dir=None):
         self.network = None
 
@@ -124,7 +126,8 @@ class VircManager:
                 users.extend(new_users)
 
         with open(host_init_users_file, 'w') as users_file:
-            users_file.write(json.dumps(users, sort_keys=True, indent=4, separators=(',', ': ')))
+            users_file.write(json.dumps(users, sort_keys=True, indent=4,
+                                        separators=(',', ': ')))
 
     def write_build_files(self):
         """Write necessary build files for our software."""
@@ -166,10 +169,10 @@ class VircManager:
             os.makedirs(server_launch_folder)
 
             lf = server.write_launch_files(server_launch_folder,
-                                          server_src_folder,
-                                          server_bin_folder,
-                                          guest_build_folder,
-                                          guest_config_folder,)
+                                           server_src_folder,
+                                           server_bin_folder,
+                                           guest_build_folder,
+                                           guest_config_folder,)
 
             if lf:
                 launch_file = os.path.join('/irc/launch', server.slug, 'launch')
@@ -299,7 +302,7 @@ class VircManager:
             except KeyError:
                 link_info = base_info[(link[1], link[0])]
 
-            info = {k: v for (k,v) in link_info}
+            info = {k: v for (k, v) in link_info}
 
             if link[0] == node:
                 info['remote_name'] = link[1].info['name']
@@ -316,7 +319,8 @@ class VircManager:
 
         return server
 
-    def generate(self, ircd_type=None, services_type=None, use_services=True, service_bots=[], opers=[]):
+    def generate(self, ircd_type=None, services_type=None, use_services=True,
+                 service_bots=[], opers=[], suffix='.dnt'):
         """Generate the given IRC server map."""
         self.network = map.IrcNetwork()
         self.network.info = {
@@ -378,12 +382,13 @@ class VircManager:
                 server_name = names.get_first_name().lower()
             used_names.append(server_name)
 
-            info['name'] = server_name + '.dnt'
+            info['name'] = server_name + suffix
 
             # generate sid
             sid = '72A'
             while sid in used_sids:
-                sid = '{}{}{}'.format(random.randint(0,9), random.randint(0,9), random.choice(string.ascii_uppercase))
+                sid = '{}{}{}'.format(random.randint(0, 9), random.randint(0, 9),
+                                      random.choice(string.ascii_uppercase))
             used_sids.append(sid)
 
             info['sid'] = sid
@@ -435,13 +440,13 @@ class VircManager:
         node_edge_color = '#cccccc'
 
         try:
-            pos = nx.graphviz_layout(self.network, prog='sfdp', args='-Goverlap=false -Gmaxiter=500 -Gcenter=1')
-            mov = True
+            pos = nx.graphviz_layout(self.network, prog='sfdp',
+                                     args='-Goverlap=false -Gmaxiter=500 -Gcenter=1')
         except:
             nl = nodelist(self.network)
             pos = nx.shell_layout(self.network, nlist=nl)
-            mov = False
-            print('Warning: Using Shell layout instead of Graphviz layout. Display may not look nice or legible.')
+            print('Warning: Using Shell layout instead of Graphviz layout. '
+                  'Display may not look as nice or legible.')
 
         # client servers
         # # # #

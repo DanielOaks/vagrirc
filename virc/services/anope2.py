@@ -94,7 +94,8 @@ class Anope2Services(BaseServices):
                     'email': uinfo.get('email', '{}@example.com'.format(name)),
                 }
 
-                commands.append(['nickserv', 'register {password} {email}'.format(**register_args)])
+                commands.append(['nickserv', 'register {password} '
+                                 '{email}'.format(**register_args)])
 
             # assemble new user
             new_user = {
@@ -157,7 +158,8 @@ class Anope2Services(BaseServices):
         else:
             raise Exception('unknown server sw in anope config setting: [{}]'.format(server_sw))
 
-        config_data = config_data.replace('name = "inspircd20"', 'name = "{}"'.format(server_sw_name))
+        config_data = config_data.replace('name = "inspircd20"',
+                                          'name = "{}"'.format(server_sw_name))
 
         # replacing uplink block
         uplink_regex = re.compile(r'uplink[\s\n]*\{[^\}]+\}')
@@ -188,7 +190,8 @@ class Anope2Services(BaseServices):
                 services_name = info['services']['name'] if 'name' in info['services'] else name
                 password = info['services']['password']
 
-                config_data += OPERATOR_BLOCK.format(level=level, name=services_name, password=password)
+                config_data += OPERATOR_BLOCK.format(level=level, name=services_name,
+                                                     password=password)
 
         # writing out config file
         output_config_dir = os.path.join(folder, 'conf')

@@ -11,8 +11,6 @@
 # with this software. If not, see
 # <http://creativecommons.org/publicdomain/zero/1.0/>.
 
-import os
-
 import yaml
 import networkx as nx
 
@@ -55,9 +53,9 @@ def dump(network):
         link_info = {}
         for name, dic in link_nx_info:
             link_info[name] = dic
-        
+
         sids = tuple(sorted([link[0].info['sid'], link[1].info['sid']]))
-        
+
         info['links'][sids] = link_info
 
     # serializing
