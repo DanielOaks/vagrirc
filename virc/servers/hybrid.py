@@ -44,8 +44,8 @@ config_initial_replacements = [
     re.compile(r'\n\s*flags = need_ident;'),
     ('hub = no;', 'hub = yes;'),
     ('throttle_time = 2 seconds;', 'throttle_time = 0;'),  # else we get locked out during config
-    ('service.someserver', 'services.dnt'),
-    ('stats.someserver', 'stats.dnt'),
+    ('service.someserver', 'services--network-suffix--'),
+    ('stats.someserver', 'stats--network-suffix--'),
 ]
 
 config_replacements = {
@@ -111,6 +111,9 @@ class HybridServer(BaseServer):
             if isinstance(rep, (list, tuple)):
                 rep, sub = rep
 
+                # lazy variables
+                sub = sub.replace('--network-suffix--', self.info['network_suffix'])
+
             # removal
             else:
                 sub = ''
@@ -165,12 +168,10 @@ class HybridServer(BaseServer):
                 config_data += OPERATOR_BLOCK.format(name=oper_name, password=oper_pass)
 
         # writing out config file
-        output_config_dir = os.path.join(folder, 'etc')
+        if not os.path.exists(folder):
+            os.makedirs(folder)
 
-        if not os.path.exists(output_config_dir):
-            os.makedirs(output_config_dir)
-
-        output_config_file = os.path.join(output_config_dir, 'reference.conf')
+        output_config_file = os.path.join(folder, 'reference.conf')
         with open(output_config_file, 'w') as config_file:
             config_file.write(config_data)
 
@@ -183,7 +184,7 @@ chmod +x ./configure
 make
 make install
 
-cp {config_folder}/etc/reference.conf {bin_folder}/etc/ircd.conf
+cp {config_folder}/reference.conf {bin_folder}/etc/ircd.conf
 """.format(src_folder=src_folder, bin_folder=bin_folder, config_folder=config_folder)
 
         build_filename = os.path.join(folder, 'build')

@@ -49,12 +49,14 @@ if __name__ == '__main__':
         service_bots = arguments.get('--service-bots', '')
         if service_bots is None:
             service_bots = ''
+        name = 'VagrIRC'
         suffix = '.dnt'
 
         if arguments['--rizon']:
             ircd = 'plexus4'
             services = 'anope2'
             service_bots = 'acid'
+            name = 'Rizon'
             suffix = '.rizon.net'
 
         service_bots = service_bots.split(',')
@@ -63,7 +65,7 @@ if __name__ == '__main__':
         ]
 
         manager.generate(ircd_type=ircd, services_type=services, service_bots=service_bots,
-                         opers=oper_usernames_and_passwords, suffix=suffix)
+                         opers=oper_usernames_and_passwords, name=name, suffix=suffix)
 
     elif arguments['write']:
         manager = virc.VircManager()

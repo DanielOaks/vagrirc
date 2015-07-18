@@ -59,8 +59,6 @@ class VircManager:
         self.src_base_dir = os.path.join(self.irc_dir, 'src')
         self.bin_base_dir = os.path.join(self.irc_dir, 'bin')
 
-        self.network_name = 'VagrIRC'
-
     def save_network_map(self):
         with open(self.serial_filename, 'w') as serial_file:
             serial_file.write(serial.dump(self.network))
@@ -283,9 +281,8 @@ class VircManager:
 
         # set server info
         server.info = node.info
-
-        # may be configurable later
-        server.info['network_name'] = self.network_name
+        server.info['network_suffix'] = self.network.info['suffix']
+        server.info['network_name'] = self.network.info['name']
 
         server.info['links'] = []
         for link in self.network.edges():
@@ -320,11 +317,13 @@ class VircManager:
         return server
 
     def generate(self, ircd_type=None, services_type=None, use_services=True,
-                 service_bots=[], opers=[], suffix='.dnt'):
+                 service_bots=[], opers=[], name="VagrIRC", suffix='.dnt'):
         """Generate the given IRC server map."""
         self.network = map.IrcNetwork()
         self.network.info = {
-            'users': {}
+            'users': {},
+            'name': name,
+            'suffix': suffix,
         }
 
         # set network info, opers etc

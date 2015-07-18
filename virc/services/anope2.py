@@ -47,7 +47,7 @@ OPERATOR_BLOCK = r"""oper
 {{
     name = "{name}"
     type = "{level}"
-    vhost = "oper.dnt"
+    vhost = "staff{suffix}"
 }}
 """
 
@@ -191,15 +191,14 @@ class Anope2Services(BaseServices):
                 password = info['services']['password']
 
                 config_data += OPERATOR_BLOCK.format(level=level, name=services_name,
-                                                     password=password)
+                                                     password=password,
+                                                     suffix=self.info['network_suffix'])
 
         # writing out config file
-        output_config_dir = os.path.join(folder, 'conf')
+        if not os.path.exists(folder):
+            os.makedirs(folder)
 
-        if not os.path.exists(output_config_dir):
-            os.makedirs(output_config_dir)
-
-        output_config_file = os.path.join(output_config_dir, 'services.conf')
+        output_config_file = os.path.join(folder, 'services.conf')
         with open(output_config_file, 'w') as config_file:
             config_file.write(config_data)
 
@@ -224,7 +223,7 @@ class Anope2Services(BaseServices):
             else:
                 config_data = rep.sub(sub, config_data)
 
-        output_config_file = os.path.join(output_config_dir, 'operserv.conf')
+        output_config_file = os.path.join(folder, 'operserv.conf')
         with open(output_config_file, 'w') as config_file:
             config_file.write(config_data)
 
@@ -241,8 +240,8 @@ cmake '-DINSTDIR:STRING={bin_folder}' -DCMAKE_BUILD_TYPE:STRING=DEBUG -DUSE_RUN_
 make
 make install
 
-cp /irc/configs/services_anope2/conf/services.conf /irc/bin/services_anope2/conf/services.conf
-cp /irc/configs/services_anope2/conf/operserv.conf /irc/bin/services_anope2/conf/operserv.conf
+cp {config_folder}/services.conf {bin_folder}/conf/services.conf
+cp {config_folder}/operserv.conf {bin_folder}/conf/operserv.conf
 """.format(src_folder=src_folder, bin_folder=bin_folder, config_folder=config_folder)
 
         build_filename = os.path.join(folder, 'build')
