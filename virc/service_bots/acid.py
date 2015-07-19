@@ -84,7 +84,13 @@ class AcidServiceBot(BaseServiceBot):
 
         # pyva-native compilation makefile
         orig, new = config_files['pyva-native']
-        shutil.copyfile(orig, new)
+        with open(orig, 'r') as config_file:
+            config_data = config_file.read()
+
+        config_data = config_data.replace('PYTHON_LDIR=/usr/lib', 'PYTHON_LDIR=/usr/lib64')
+
+        with open(new, 'w') as config_file:
+            config_file.write(config_data)
 
         # pyva config file
         # # # #
