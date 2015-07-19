@@ -178,6 +178,22 @@ class AcidServiceBot(BaseServiceBot):
 
     def write_build_files(self, folder, src_folder, bin_folder, build_folder, config_folder):
         """Write build files to the given folder."""
+        # base sql files
+        base_file = """# Acid base databases and users
+CREATE DATABASE acidcore;
+GRANT ALL PRIVILEGES ON acidcore.* TO 'acid'@'localhost' IDENTIFIED BY 'acidpass';
+CREATE DATABASE pypsd;
+GRANT ALL PRIVILEGES ON pypsd.* TO 'pyps'@'localhost' IDENTIFIED BY 'marleymoo';
+
+FLUSH PRIVILEGES;
+"""
+
+        base_filename = os.path.join(folder, 'base.sql')
+
+        with open(base_filename, 'w') as b_file:
+            b_file.write(base_file)
+
+        # build file
         build_file = """#!/usr/bin/env sh
 mkdir -p {bin_folder}
 cp -R {src_folder}/. {bin_folder}
@@ -194,9 +210,11 @@ cp {config_folder}/acidictive.yml {bin_folder}/acidictive.yml
 cp {config_folder}/pyva.yml {bin_folder}/pyva.yml
 cp {config_folder}/config.ini {bin_folder}/config.ini
 
+mysql -u 'root' --password=password < {build_folder}/base.sql
 mysql -u 'acid' --password=acidpass --database=acidcore < {bin_folder}/acid/acidcore.sql
 mysql -u 'acid' --password=acidpass --database=acidcore < {config_folder}/acid.sql
-""".format(src_folder=src_folder, bin_folder=bin_folder, config_folder=config_folder)
+""".format(src_folder=src_folder, bin_folder=bin_folder,
+           build_folder=build_folder, config_folder=config_folder)
 
         build_filename = os.path.join(folder, 'build')
 
