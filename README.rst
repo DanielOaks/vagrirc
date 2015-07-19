@@ -40,6 +40,8 @@ FAQ
 
     I tend to simply cd into the ``bin`` folder of the component I'm testing / developing and launching it in a 'foreground' mode. Some software let you specify ``-f``, some ``-foreground``, that let you launch the component and stay attached to the shell so you can easily ctrl+c and close it. However, this may mess up databases and cause issues, so it's not recommended.
 
+    **Note:** Some software also includes a foreground launch script under ``/irc/launch/software_name/launch_foreground``. This launches the software into the foreground, as described above, and keeps it attached to the shell.
+
 
 * I can't get something to work, or something's broken!
 
