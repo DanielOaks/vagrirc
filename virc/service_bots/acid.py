@@ -139,7 +139,7 @@ class AcidServiceBot(BaseServiceBot):
         conf['database'][0]['pass'] = 'acidpass'
 
         conf['debug'] = True
-        conf['serverinfo']['name'] = 'acid.dnt'
+        conf['serverinfo']['name'] = 'acid' + self.info['network_suffix']
 
         # and writing it out
         with open(new, 'w') as config_file:
