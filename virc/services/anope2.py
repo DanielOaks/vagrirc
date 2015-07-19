@@ -63,7 +63,7 @@ ADDITIONAL_BLOCKS = r"""opertype
 class Anope2Services(BaseServices):
     """A set of IRC services for IRC networks."""
     name = 'anope2'
-    release = '2.0.1'
+    release = '2.0.2'
     url = 'https://github.com/anope/anope/archive/{release}.zip'
 
     def init_users(self, info):
