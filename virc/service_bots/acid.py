@@ -12,7 +12,6 @@
 # <http://creativecommons.org/publicdomain/zero/1.0/>.
 
 import os
-import shutil
 import configparser
 
 import yaml
@@ -181,7 +180,7 @@ class AcidServiceBot(BaseServiceBot):
         """Write build files to the given folder."""
         build_file = """#!/usr/bin/env sh
 mkdir -p {bin_folder}
-cp -R {src_folder}/* {bin_folder}
+cp -R {src_folder}/. {bin_folder}
 cd {bin_folder}
 
 cp {config_folder}/make.properties {bin_folder}/pyva/pyva-native/pyva-cpp/
@@ -208,12 +207,23 @@ mysql -u 'acid' --password=acidpass --database=acidcore < {config_folder}/acid.s
 
     def write_launch_files(self, folder, src_folder, bin_folder, build_folder, config_folder):
         """Write launch files to the given folder."""
+        # foreground
         launch_file = """#!/usr/bin/env sh
 
 cd {bin_folder}
 JAR=acid/target/acid-acid-4.0-SNAPSHOT-jar-with-dependencies.jar
-LD_PRELOAD="/usr/lib64/libpython2.7.so" java -XX:+HeapDumpOnOutOfMemoryError -Xms64m -Xmx256m -jar $JAR >geoserv.log 2>&1 &
-""".format(src_folder=src_folder, bin_folder=bin_folder, config_folder=config_folder)
+LD_PRELOAD="/usr/lib64/libpython2.7.so" java -XX:+HeapDumpOnOutOfMemoryError -Xms64m -Xmx256m -jar $JAR"""
+
+        launch_file = launch_file.format(src_folder=src_folder, bin_folder=bin_folder,
+                                         config_folder=config_folder)
+
+        launch_filename = os.path.join(folder, 'launch_foreground')
+
+        with open(launch_filename, 'w') as l_file:
+            l_file.write(launch_file + '\n')
+
+        # regular
+        launch_file = launch_file + " >geoserv.log 2>&1 &\n"
 
         launch_filename = os.path.join(folder, 'launch')
 
