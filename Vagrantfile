@@ -69,7 +69,7 @@ Vagrant.configure(2) do |config|
   config.vm.provision "shell", inline: "chmod +x /irc/launch/launch_core && /irc/launch/launch_core", privileged: false, run: "always"
 
   # create clients and channels with NickServ and such
-  config.vm.provision "shell", inline: "chmod +x /irc/init/init && /irc/init/init", privileged: false
+  config.vm.provision "shell", inline: "chmod +x /irc/init/init && /irc/init/init", privileged: true
 
   # now that users and such exist, launch rest of the software
   config.vm.provision "shell", inline: "chmod +x /irc/launch/launch_rest && /irc/launch/launch_rest", privileged: false, run: "always"
