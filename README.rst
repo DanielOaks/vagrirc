@@ -25,6 +25,8 @@ Vagrant will run through the setup of your machine, including compiling the ircd
 
 Everything is laid out in the ``irc/`` folder. Underneath there, the ``bin`` folder is where your running services and programs run - and where you can change the configuration files for each program. Keep in mind that simply running ``./vagrirc write`` should not overwrite the contents of that ``bin`` folder, as it is populated during provisioning.
 
+**NOTE:** ``/irc/build/*`` scripts **WILL OVERWRITE YOUR PROJECT'S ``/irc/bin/etc`` FOLDER**. For service bots like ``acid``, running the automatic build script will overwrite any changes you've made and your git repo in there.
+
 
 FAQ
 ---
