@@ -240,12 +240,31 @@ class VircManager:
         server_list = self.server_list()
         info = self.info_from_server_list(server_list)
 
+        svr = []
+
         for node, server in server_list:
+            # do client server last
+            if node.client:
+                svr = [node, server]
+                continue
+
             server_config_folder = os.path.join(self.configs_base_dir, server.slug)
             shutil.rmtree(server_config_folder)
             os.makedirs(server_config_folder)
 
             server.write_config(server_config_folder, info)
+
+        # do client server last, since some info is regenerated in the write_config stage,
+        #   and this messes us up when we try to do dynamic oper passwords
+        node, server = svr
+
+        server_config_folder = os.path.join(self.configs_base_dir, server.slug)
+        shutil.rmtree(server_config_folder)
+        os.makedirs(server_config_folder)
+
+        info = self.info_from_server_list(server_list)
+
+        server.write_config(server_config_folder, info)
 
     def info_from_server_list(self, server_list):
         """Return info and server list."""
