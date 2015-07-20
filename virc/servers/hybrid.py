@@ -133,8 +133,6 @@ class HybridServer(BaseServer):
                     config_data = config_data.replace(rep, sub)
                 else:
                     config_data = rep.sub(sub, config_data)
-            else:
-                print('hybrid regex: skipping key:', key)
 
         # listening ports
         lregex = re.compile(r'(\nauth \{[^\}]+\};)')
