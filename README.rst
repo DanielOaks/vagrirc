@@ -14,7 +14,7 @@ You need to make sure `Python3 <https://www.python.org/downloads/>`_ and `Vagran
 1. ``git clone https://github.com/DanielOaks/vagrirc.git``
 2. ``cd vagrirc``
 3. ``vagrant plugin install vagrant-cachier``
-4. ``pip3 install -r requirements.txt``
+4. ``pip3 install --upgrade -r requirements.txt``
 5. ``./vagrirc.py generate --oper coolguy:coolpassword --ircd hybrid --services anope2``
 6. ``./vagrirc.py write``
 7. ``vagrant up``
