@@ -1,4 +1,4 @@
-#!/usr/bin/env sh
+#!/usr/bin/env python3
 # VagrIRC Initialization Bot
 
 # Written in 2015 by Daniel Oaks <daniel@danieloaks.net>
@@ -11,8 +11,18 @@
 # with this software. If not, see
 # <http://creativecommons.org/publicdomain/zero/1.0/>.
 
-cd ${0%/*}
+import os
+import json
 
-pip3 install -r requirements.txt
+from users import User
 
-python3 init.py
+init_dir = os.path.dirname(os.path.abspath(__file__))
+
+# join users one-by-one and execute commands
+users_filename = os.path.join(init_dir, 'users.json')
+with open(users_filename) as users_file:
+    users = json.loads(users_file.read())
+
+for info in users:
+    user = User(**info)
+    user.run()

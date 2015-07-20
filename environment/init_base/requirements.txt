@@ -1,0 +1,1 @@
+-e git+https://github.com/mammon-ircd/ircreactor.git#egg=ircreactor

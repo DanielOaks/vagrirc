@@ -14,7 +14,7 @@
 import socket
 from time import sleep
 
-from envelope import RFC1459Message
+from ircreactor.envelope import RFC1459Message
 
 
 class User:
