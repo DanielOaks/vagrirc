@@ -57,6 +57,12 @@ ADDITIONAL_BLOCKS = r"""opertype
     commands = "chanserv/status *"
     privs = "chanserv/status *"
 }
+opertype
+{
+    name = "Moo Service Bot"
+    commands = "*"
+    privs = "*"
+}
 """
 
 
@@ -184,6 +190,8 @@ class Anope2Services(BaseServices):
                 level = 'Services Root'
             elif level == 'acid service bot':
                 level = 'Acid Service Bot'
+            elif level == 'moo service bot':
+                level = 'Moo Service Bot'
 
             # only add operator block if they have a valid level
             if level:

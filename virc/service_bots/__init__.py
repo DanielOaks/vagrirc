@@ -12,7 +12,9 @@
 # <http://creativecommons.org/publicdomain/zero/1.0/>.
 
 from . import acid
+from . import moo
 
 available = {
     'acid': acid.AcidServiceBot,
+    'moo': moo.MooServiceBot,
 }
