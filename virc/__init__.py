@@ -98,6 +98,11 @@ class VircManager:
 
         return sw
 
+    def download_source(self):
+        """Download source code."""
+        for node, server in self.server_list():
+            server.download_release()
+
     def write_init_files(self):
         """Write necessary init files for our software."""
         # remove old config files

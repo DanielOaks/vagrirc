@@ -54,14 +54,13 @@ class ReleaseDownloader:
                 # could also strip out # magic if necessary, later
                 self._download_type = self.url.rsplit('.', 1)[-1]
 
-        self.download_release()
-
     def download_release(self):
         """Download our expected release of the server, if not already cached."""
         if self.vcs == 'git':
             import git
 
             if os.path.exists(self.source_folder):
+                print('Updating', self.name)
                 repo = git.Repo(self.source_folder)
                 repo.remotes.origin.fetch()
                 repo.remotes.origin.pull()

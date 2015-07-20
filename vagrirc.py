@@ -32,6 +32,7 @@ Options:
     --services <services>        Services package to provision [default: anope2].
     --service-bots <bots>...     Service bots to include (separated by comma <,>).
     --rizon                      Setup a network with Rizon's services, ircd, and bots.
+    --with-moo                   Include moo while setting up a Rizon network.
     (--oper <name:password>)...  Make an oper / opers with the given names and passwords.
     -h, --help                   Show this screen
     --version                    Show VagrIRC version
@@ -55,7 +56,10 @@ if __name__ == '__main__':
         if arguments['--rizon']:
             ircd = 'plexus4'
             services = 'anope2'
-            service_bots = 'acid'
+            if arguments['--with-moo']:
+                service_bots = 'acid,moo'
+            else:
+                service_bots = 'acid'
             name = 'Rizon'
             suffix = '.rizon.net'
 
@@ -70,6 +74,7 @@ if __name__ == '__main__':
     elif arguments['write']:
         manager = virc.VircManager()
         manager.load_network_map()
+        manager.download_source()
         manager.write_server_configs()
         manager.write_source_files()
         manager.write_build_files()
