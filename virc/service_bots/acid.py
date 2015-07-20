@@ -66,6 +66,11 @@ class AcidServiceBot(BaseServiceBot):
                              'make.example.properties'),
                 os.path.join(folder, 'make.properties'),
             ],
+            'pyva-native-alt': [
+                os.path.join(self.source_folder, 'pyva', 'pyva-native', 'pyva-native',
+                             'make.example.properties'),
+                os.path.join(folder, 'make.properties'),
+            ],
             'acid': [
                 os.path.join(self.source_folder, 'acid', 'acidictive.example.yml'),
                 os.path.join(folder, 'acidictive.yml'),
@@ -83,6 +88,10 @@ class AcidServiceBot(BaseServiceBot):
 
         # pyva-native compilation makefile
         orig, new = config_files['pyva-native']
+
+        if not os.path.exists(orig):
+            orig, new = config_files['pyva-native-alt']
+
         with open(orig, 'r') as config_file:
             config_data = config_file.read()
 
@@ -199,7 +208,11 @@ mkdir -p {bin_folder}
 cp -R {src_folder}/. {bin_folder}
 cd {bin_folder}
 
-cp {config_folder}/make.properties {bin_folder}/pyva/pyva-native/pyva-cpp/
+if [ -d "{bin_folder}/pyva/pyva-native/pyva-cpp/" ]; then
+    cp {config_folder}/make.properties {bin_folder}/pyva/pyva-native/pyva-cpp/
+else
+    cp {config_folder}/make.properties {bin_folder}/pyva/pyva-native/pyva-native/
+fi
 
 mvn install
 

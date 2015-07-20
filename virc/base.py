@@ -58,13 +58,9 @@ class ReleaseDownloader:
 
     def download_release(self):
         """Download our expected release of the server, if not already cached."""
-        if self.url is None:
-            return False
-
         if self.vcs == 'git':
             import git
 
-            return True  # XXX - temp, testing, should not be here
             if os.path.exists(self.source_folder):
                 repo = git.Repo(self.source_folder)
                 repo.remotes.origin.fetch()
@@ -84,6 +80,9 @@ class ReleaseDownloader:
             repo.heads.master.checkout()
 
         else:
+            if self.url is None:
+                return False
+
             # see if it already exists
             if os.path.exists(self.source_folder):
                 return True
