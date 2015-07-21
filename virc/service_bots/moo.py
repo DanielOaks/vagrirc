@@ -105,10 +105,6 @@ class MooServiceBot(BaseServiceBot):
                 os.path.join(self.source_folder, 'osflood', 'osflood.yml.template'),
                 os.path.join(modules_folder, 'osflood.yml'),
             ],
-            'wiki': [
-                os.path.join(self.source_folder, 'wiki', 'wiki.yml.template'),
-                os.path.join(modules_folder, 'wiki.yml'),
-            ],
         }
 
         # moo config file
@@ -131,6 +127,7 @@ class MooServiceBot(BaseServiceBot):
         conf['plugins'].remove('servermonitor')
         conf['plugins'].remove('tickets')
         conf['plugins'].remove('commits')
+        conf['plugins'].remove('wiki')
 
         # and writing it out
         with open(new, 'w') as config_file:
@@ -162,7 +159,7 @@ class MooServiceBot(BaseServiceBot):
 
         # other config files
         # # # #
-        for name in ['antiidle', 'core', 'dnsbl', 'logging', 'osflood', 'wiki']:
+        for name in ['antiidle', 'core', 'dnsbl', 'logging', 'osflood']:
             orig, new = config_files[name]
 
             shutil.copyfile(orig, new)
@@ -181,7 +178,6 @@ cp {config_folder}/modules/dnsbl.yml {bin_folder}/dnsbl.yml
 cp {config_folder}/modules/grapher.yml {bin_folder}/grapher.yml
 cp {config_folder}/modules/logging.yml {bin_folder}/logging.yml
 cp {config_folder}/modules/osflood.yml {bin_folder}/osflood.yml
-cp {config_folder}/modules/wiki.yml {bin_folder}/wiki.yml
 cp {config_folder}/modules/vote.yml {bin_folder}/vote.yml
 
 mvn package
