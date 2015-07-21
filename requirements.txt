@@ -5,3 +5,4 @@ gitpython
 networkx
 requests
 PyYAML
+matplotlib
