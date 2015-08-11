@@ -481,8 +481,9 @@ class VircManager:
         else:
             client_color = (0.9, 0.7, 0.7)
 
+        nl_to_draw = (n for n in self.network.nodes() if not n.services and not n.service_bot)
         nodes = nx.draw_networkx_nodes(self.network, pos, **{
-            'nodelist': [n for n in self.network.nodes() if not n.services and not n.service_bot],
+            'nodelist': nl_to_draw,
             'node_color': client_color,
             'node_size': 120,
             'node_shape': 'h',

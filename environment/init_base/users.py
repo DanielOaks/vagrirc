@@ -19,6 +19,7 @@ from ircreactor.envelope import RFC1459Message
 
 class User:
     """User, connects and executes commands."""
+
     def __init__(self, nick, username, commands):
         self._new_data = ''
 

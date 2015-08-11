@@ -11,8 +11,6 @@
 # with this software. If not, see
 # <http://creativecommons.org/publicdomain/zero/1.0/>.
 
-import random
-import string
 import networkx as nx
 
 
@@ -55,7 +53,11 @@ class MapBaseServer:
         else:
             raise Exception('this node type not implemented: {}'.format(self))
 
-        return '{}{}{}'.format(prefix, '_' if prefix else '', self.info.get('name', '').split('_')[0])
+        slug = '{}{}{}'.format(prefix,
+                               '_' if prefix else '',
+                               self.info.get('name', '').split('_')[0])
+
+        return slug
 
 
 class MapClientServer(MapBaseServer):

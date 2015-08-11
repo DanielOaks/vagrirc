@@ -56,10 +56,9 @@ if __name__ == '__main__':
         if arguments['--rizon']:
             ircd = 'plexus4'
             services = 'anope2'
+            service_bots = 'acid'
             if arguments['--with-moo']:
-                service_bots = 'acid,moo'
-            else:
-                service_bots = 'acid'
+                service_bots += ',moo'
             name = 'Rizon'
             suffix = '.rizon.net'
 

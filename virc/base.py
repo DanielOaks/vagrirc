@@ -70,7 +70,8 @@ class ReleaseDownloader:
                 assert origin.exists()
                 origin.fetch()
                 # track remote branch
-                repo.create_head('master', origin.refs.master).set_tracking_branch(origin.refs.master)
+                repo.create_head('master', origin.refs.master).set_tracking_branch(
+                    origin.refs.master)
                 origin.pull()
 
             for submodule in repo.submodules:
@@ -89,7 +90,8 @@ class ReleaseDownloader:
             url = self.url.format(release=self.release)
 
             # download file
-            tmp_filename = os.path.join(self.cache_directory, 'tmp_download.{}'.format(self._download_type))
+            tmp_with_ext = 'tmp_download.{}'.format(self._download_type)
+            tmp_filename = os.path.join(self.cache_directory, tmp_with_ext)
             with open(tmp_filename, 'wb') as handle:
                 r = requests.get(url, stream=True)
 
