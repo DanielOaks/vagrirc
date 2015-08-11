@@ -1,8 +1,8 @@
 appdirs
 docopt
 gitpython
+matplotlib
 names
 networkx
 requests
 PyYAML
-matplotlib
