@@ -372,7 +372,7 @@ class VircManager:
         # # # #
 
         map.MapClientServer(self.network, ircd_type)
-        only_client_server = self.network.nodes()[0]
+        only_client_server = list(self.network.nodes())[0]
 
         # add a services server
         new_services = map.MapServicesServer(self.network, services_type)
@@ -451,7 +451,9 @@ class VircManager:
         self.save_network_map()
 
         # draw a pretty diagram of the network
-        self.draw_network_diagram()
+        print('Drawing network diagrams has been temporarily disabled while '
+              'NetworkX fixes stuff in their update to Python3')
+        # self.draw_network_diagram()
 
     def draw_network_diagram(self):
         """Draw a diagram of our network."""
