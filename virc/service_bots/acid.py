@@ -62,12 +62,12 @@ class AcidServiceBot(BaseServiceBot):
         """Write config file to the given folder."""
         config_files = {
             'pyva-native': [
-                os.path.join(self.source_folder, 'pyva', 'pyva-native', 'pyva-cpp',
+                os.path.join(self.source_folder, 'pyva', 'libpyva', 'pyva-native',
                              'make.example.properties'),
                 os.path.join(folder, 'make.properties'),
             ],
             'pyva-native-alt': [
-                os.path.join(self.source_folder, 'pyva', 'pyva-native', 'pyva-native',
+                os.path.join(self.source_folder, 'pyva', 'libpyva', 'pyva-native',
                              'make.example.properties'),
                 os.path.join(folder, 'make.properties'),
             ],
@@ -80,8 +80,8 @@ class AcidServiceBot(BaseServiceBot):
                 os.path.join(folder, 'pyva.yml'),
             ],
             'conf': [
-                os.path.join(self.source_folder, 'pyva', 'config.example.ini'),
-                os.path.join(folder, 'config.ini'),
+                os.path.join(self.source_folder, 'pyva', 'pypsd.example.yml'),
+                os.path.join(folder, 'pypsd.yml'),
             ],
             'sql': os.path.join(folder, 'acid.sql'),
         }
@@ -148,19 +148,19 @@ class AcidServiceBot(BaseServiceBot):
 
         conf['debug'] = True
         conf['serverinfo']['name'] = 'acid' + self.info['network_suffix']
+        conf['services']['anope_major'] = 2
 
         # and writing it out
         with open(new, 'w') as config_file:
             config_file.write(yaml.dump(conf))
 
-        # config.ini config file
+        # pypsd.yml config file
         # # # #
         orig, new = config_files['conf']
         with open(orig, 'r') as config_file:
             config_data = config_file.read()
 
-        conf = configparser.ConfigParser()
-        conf.read_string(config_data, orig)
+        conf = yaml.load(config_data)
 
         # setting info
         conf['database']['host'] = '127.0.0.1'
@@ -170,7 +170,7 @@ class AcidServiceBot(BaseServiceBot):
 
         # and writing it out
         with open(new, 'w') as config_file:
-            conf.write(config_file)
+            config_file.write(yaml.dump(conf))
 
         # sql file
         # # # #
@@ -208,20 +208,16 @@ mkdir -p {bin_folder}
 cp -R {src_folder}/. {bin_folder}
 cd {bin_folder}
 
-if [ -d "{bin_folder}/pyva/pyva-native/pyva-cpp/" ]; then
-    cp {config_folder}/make.properties {bin_folder}/pyva/pyva-native/pyva-cpp/
-else
-    cp {config_folder}/make.properties {bin_folder}/pyva/pyva-native/pyva-native/
-fi
+cp {config_folder}/make.properties {bin_folder}/pyva/libpyva/pyva-native/
 
 mvn install
 
-ln -s pyva/pyva-native/pyva-cpp/libpyva.so libpyva.so
+ln -s pyva/libpyva/pyva-native/libpyva.so libpyva.so
 sudo pip2.7 install -r pyva/requirements.txt --allow-external py-dom-xpath --allow-unverified py-dom-xpath
 
 cp {config_folder}/acidictive.yml {bin_folder}/acidictive.yml
 cp {config_folder}/pyva.yml {bin_folder}/pyva.yml
-cp {config_folder}/config.ini {bin_folder}/config.ini
+cp {config_folder}/pypsd.yml {bin_folder}/pypsd.yml
 
 mysql -u 'root' --password=password < {build_folder}/base.sql
 mysql -u 'acid' --password=acidpass --database=acidcore < {bin_folder}/acid/acidcore.sql
