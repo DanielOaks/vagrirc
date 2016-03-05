@@ -4,7 +4,7 @@
 Vagrant.configure(2) do |config|
 
   # We use Centos because it's a nice, stable, and works well.
-  config.vm.box = "chef/centos-6.6"
+  config.vm.box = "bento/centos-6.7"
   config.vm.box_check_update = false  # you can check this manually
 
   # Hostname
