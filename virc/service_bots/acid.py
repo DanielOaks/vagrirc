@@ -148,7 +148,6 @@ class AcidServiceBot(BaseServiceBot):
 
         conf['debug'] = True
         conf['serverinfo']['name'] = 'acid' + self.info['network_suffix']
-        conf['services']['anope_major'] = 2
 
         # and writing it out
         with open(new, 'w') as config_file:
@@ -163,6 +162,7 @@ class AcidServiceBot(BaseServiceBot):
         conf = yaml.load(config_data)
 
         # setting info
+        conf['services']['anope_major'] = 2
         conf['database']['host'] = '127.0.0.1'
         conf['database']['user'] = 'pyps'
         conf['database']['passwd'] = 'marleymoo'
