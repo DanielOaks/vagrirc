@@ -288,14 +288,17 @@ class VircManager:
 
         for node in self.network.nodes():
             server = self.node_to_server(node)
-            server.slug = '{}_{}'.format(server._slug_type, node.software)
+            if server:
+                server.slug = '{}_{}'.format(server._slug_type, node.software)
 
-            srv_list.append((node, server))
+                srv_list.append((node, server))
 
         return srv_list
 
     def node_to_server(self, node):
         # create server
+        if not node.software:
+            return
         if node.client:
             server = servers.available[node.software]()
         elif node.services:
