@@ -9,7 +9,7 @@ CACHE_FOLDER=/environment/cache/packages
 echo 'Installing additional packages'
 apt-get install -y python python-dev python-pip >/dev/null
 
-apt-get install -y python3 python3-dev >/dev/null
+apt-get install -y python3 python3-dev python3-pip >/dev/null
 
 apt-get install -y autoconf automake libtool >/dev/null
 
