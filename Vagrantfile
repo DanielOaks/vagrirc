@@ -3,8 +3,8 @@
 
 Vagrant.configure(2) do |config|
 
-  # We use Centos because it's a nice, stable, and works well.
-  config.vm.box = "bento/centos-6.7"
+  # Ubuntu is updated regularly enough, should work decently.
+  config.vm.box = "ubuntu/trusty64"
   config.vm.box_check_update = false  # you can check this manually
 
   # Hostname
@@ -17,7 +17,7 @@ Vagrant.configure(2) do |config|
   # Cache packages so we don't spend a million years downloading
   #   each time we startup
   if Vagrant.has_plugin?("vagrant-cachier")
-    config.cache.enable :yum
+    config.cache.enable :apt
     config.cache.enable :gem
     config.cache.scope = :box
   end
@@ -39,15 +39,20 @@ Vagrant.configure(2) do |config|
   config.vm.synced_folder "./irc", "/irc", :nfs => enable_nfs
   config.vm.synced_folder "./environment", "/environment", :nfs => enable_nfs
 
+  # stop irritating messages on ubuntu
+  # see also: http://foo-o-rama.com/vagrant--stdin-is-not-a-tty--fix.html
+  config.vm.provision "fix-no-tty", type: "shell" do |s|
+    s.privileged = false
+    s.inline = "sudo sed -i '/tty/!s/mesg n/tty -s \\&\\& mesg n/' /root/.profile"
+  end
+
   # Base Software Provisioning
   # these files are split up like this so vagrant-cachier can do its work
-  config.vm.provision "shell", path: "environment/shell/1.perl.sh"
-  config.vm.provision "shell", path: "environment/shell/2.repos.1.init.sh"
-  config.vm.provision "shell", path: "environment/shell/2.repos.2.packages.sh"
-  config.vm.provision "shell", path: "environment/shell/3.ruby.1.init.sh"
-  config.vm.provision "shell", path: "environment/shell/3.ruby.2.update.sh"
-  config.vm.provision "shell", path: "environment/shell/4.puppet.sh"
-  config.vm.provision "shell", path: "environment/shell/5.additional.sh"
+  config.vm.provision "shell", path: "environment/shell/1.base.packages.sh"
+  config.vm.provision "shell", path: "environment/shell/2.additional.sh"
+  config.vm.provision "shell", path: "environment/shell/3.rvm.sh"
+  config.vm.provision "shell", path: "environment/shell/4.ruby.sh"
+  config.vm.provision "shell", path: "environment/shell/5.puppet.sh"
 
   # Puppet
   config.vm.provision "shell", inline: "gem install librarian-puppet"
@@ -59,9 +64,9 @@ Vagrant.configure(2) do |config|
     puppet.facter = {
       "fqdn" => "localhost",
     }
+    puppet.environment_path = "environment"
+    puppet.environment = "puppet"
     puppet.options = ['--modulepath=/tmp/modules']
-    puppet.manifests_path = "environment/manifests"
-    puppet.manifest_file = ""
   end
 
   # provision IRC software!

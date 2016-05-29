@@ -55,5 +55,3 @@ FAQ
 License
 -------
 CC0 1.0 Universal on all my code.
-
-Part of the ``environment/shell/*.sh`` core files are from the `PuPHPet <https://github.com/puphpet/puphpet>`_ project, which is used under the `MIT License <http://opensource.org/licenses/mit-license.php>`_.
